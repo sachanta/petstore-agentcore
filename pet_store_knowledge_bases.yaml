@@ -1,0 +1,673 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'A template to get you started solving the Clash of Agents Virtual Pet Store challenge'
+
+Parameters:
+  SolutionAccessRoleArn: 
+    Description: The ARN of the solution access role for automation scripts.
+    Type: String
+
+  DataBucketForKnowledgeArn:
+    Description: The ARN of the S3 Bucket storing knowledge to be indexed.
+    Type: String
+
+  DataBucketInclusionPrefix:
+    Description: S3 prefix to include specific files or folders for indexing
+    Default: pet-store-products/
+    Type: String
+    MaxLength: 300
+
+  AOSSCollectionName:
+    Description: Name of the Amazon OpenSearch Service Serverless (AOSS) collection.
+    Default: clashofagents
+    Type: String
+    MinLength: 1
+    MaxLength: 21
+    AllowedPattern: ^[a-z0-9](-*[a-z0-9])*
+    ConstraintDescription: Must be lowercase or numbers with a length of 1-63 characters.
+
+  ProductInfo1stKnowledgeBaseName:
+    Description: Name of 1st Knowledge Base Name for Virtual Pet Store Product Information
+    Default: ProductInformation
+    Type: String
+
+  PetCare2ndKnowledgeBaseName:
+    Description: 2nd Knowledge Base Name for Virtual Pet Store Careing Information
+    Default: PetCaringKnowledge
+    Type: String
+
+  GuardrailName:
+    Description: Name of the Bedrock Guardrail
+    Default: PetStoreGuardrail
+    Type: String
+
+Resources:
+  DataAccessPolicy:
+    Type: 'AWS::OpenSearchServerless::AccessPolicy'
+    Properties:
+      Name: !Join
+        - '-'
+        - - !Ref AOSSCollectionName
+          - access-policy
+      Type: data
+      Description: Access policy for the AOSS collection
+      Policy: !Sub >-
+        [{"Description":"Access for cfn user","Rules":[{"ResourceType":"index","Resource":["index/${AOSSCollectionName}/*"],"Permission":[
+                    "aoss:CreateIndex",
+                    "aoss:UpdateIndex",
+                    "aoss:DescribeIndex",
+                    "aoss:ReadDocument",
+                    "aoss:WriteDocument"
+                  ]},
+        {"ResourceType":"collection","Resource":["collection/${AOSSCollectionName}"],"Permission":["aoss:*"]}],
+        "Principal":["${SolutionAccessRoleArn}"]}]
+
+  Collection:
+    Type: 'AWS::OpenSearchServerless::Collection'
+    Properties:
+      Name: !Ref AOSSCollectionName
+      Type: VECTORSEARCH
+      StandbyReplicas: DISABLED
+      Description: Collection to hold vector search data
+    DependsOn: EncryptionPolicy
+
+  NetworkPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: !Join
+        - '-'
+        - - !Ref AOSSCollectionName
+          - net-policy
+      Type: network
+      Description: Network policy for the AOSS collection
+      Policy: !Sub >-
+        [{"Rules":[{"ResourceType":"collection","Resource":["collection/${AOSSCollectionName}"]}, {"ResourceType":"dashboard","Resource":["collection/${AOSSCollectionName}"]}],"AllowFromPublic":true}]
+
+  EncryptionPolicy:
+    Type: 'AWS::OpenSearchServerless::SecurityPolicy'
+    Properties:
+      Name: !Join
+        - '-'
+        - - !Ref AOSSCollectionName
+          - security-policy
+      Type: encryption
+      Description: Encryption policy for the AOSS collection
+      Policy: !Sub >-
+        {"Rules":[{"ResourceType":"collection","Resource":["collection/${AOSSCollectionName}"]}],"AWSOwnedKey":true}
+
+  VectorIndexUpdate:
+    Type: Custom::OpenSearchServerlessVectorIndex
+    Properties:
+      ServiceToken: !GetAtt OpenSearchVectorIndexLambda.Arn
+      CollectionName: !Ref AOSSCollectionName
+      ProductInfoIndexName: product_info_index
+      PetCareIndexName: pet_care_index
+    DependsOn: Collection
+
+  OpenSearchVectorIndexLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !Ref SolutionAccessRoleArn
+      Code:
+        ZipFile: |
+          # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+          # SPDX-License-Identifier: MIT-0
+          
+          import os
+          import sys
+          import subprocess
+          import json
+          import traceback
+          import boto3
+          import urllib3
+          import logging
+          import base64
+          import time
+          import random
+          import string
+          
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def install_and_import_dependencies():
+              subprocess.check_call([sys.executable, "-m", "pip", "install", "--target", "/tmp", "requests", "requests_aws4auth"])
+              sys.path.append('/tmp')
+              global requests, AWS4Auth
+              import requests
+              from requests_aws4auth import AWS4Auth
+              logger.info("Dependencies installed and imported successfully")
+
+          def generate_policy_version():
+              timestamp = int(time.time())
+              random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+              version_string = f"{timestamp}-{random_string}"
+              return base64.b64encode(version_string.encode()).decode().rstrip('=')
+
+          def send_cfn_response(event, context, response_status, response_data, physical_resource_id=None, reason=None):
+              response_url = event['ResponseURL']
+              logger.info(f"CFN response URL: {response_url}")
+
+              response_body = {
+                  'Status': response_status,
+                  'Reason': reason or f"See the details in CloudWatch Log Stream: {context.log_stream_name}",
+                  'PhysicalResourceId': physical_resource_id or context.log_stream_name,
+                  'StackId': event['StackId'],
+                  'RequestId': event['RequestId'],
+                  'LogicalResourceId': event['LogicalResourceId'],
+                  'NoEcho': False,
+                  'Data': response_data
+              }
+
+              json_response_body = json.dumps(response_body)
+              logger.info(f"CFN response body: {json_response_body}")
+
+              headers = {
+                  'content-type': '',
+                  'content-length': str(len(json_response_body))
+              }
+
+              try:
+                  http = urllib3.PoolManager()
+                  response = http.request('PUT', response_url, headers=headers, body=json_response_body)
+                  logger.info(f"CFN response status code: {response.status}")
+              except Exception as e:
+                  logger.error(f"Error sending CFN response: {str(e)}")
+
+          def handler(event, context):
+              logger.info(f"Received event: {json.dumps(event)}")
+              
+              try:
+                  install_and_import_dependencies()
+
+                  region = os.environ['AWS_REGION']
+                  service = 'aoss'
+                  credentials = boto3.Session().get_credentials()
+                  awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
+                  
+                  collection_name = event['ResourceProperties']['CollectionName']
+                  product_info_index_name = event['ResourceProperties']['ProductInfoIndexName']
+                  pet_care_index_name = event['ResourceProperties']['PetCareIndexName']
+                  
+                  client = boto3.client('opensearchserverless')
+                  
+                  logger.info(f"Attempting to get collection details for {collection_name}")
+                  collection_data = client.batch_get_collection(names=[collection_name])['collectionDetails'][0]
+                  collection_endpoint = collection_data['collectionEndpoint']
+                  
+                  logger.info(f"Collection endpoint: {collection_endpoint}")
+                  
+
+                  if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+                      logger.info("Going to sleep")
+                      time.sleep(120)
+                      logger.info("Woke up")
+                      create_vector_index(collection_endpoint, product_info_index_name, pet_care_index_name, awsauth)
+                      time.sleep(30)
+                  elif event['RequestType'] == 'Delete':
+                      delete_index(collection_endpoint, product_info_index_name, pet_care_index_name, awsauth)
+                  
+                  send_cfn_response(event, context, 'SUCCESS', {"message": "Operation completed successfully"})
+              except Exception as e:
+                  logger.error(f"Error occurred: {str(e)}")
+                  logger.error(f"Traceback: {traceback.format_exc()}")
+                  send_cfn_response(event, context, 'FAILED', {"error": str(e)})
+
+          def create_vector_index(endpoint, product_info_index_name, pet_care_index_name, awsauth):
+              product_info_index_url = f'{endpoint}/{product_info_index_name}'
+              pet_care_index_url = f'{endpoint}/{pet_care_index_name}'
+              
+              index_body = {
+                  "settings": {
+                      "index.knn": True
+                  },
+                  "mappings": {
+                      "properties": {
+                          "vector": {
+                              "type": "knn_vector",
+                              "dimension": 1024,
+                              "method": {
+                                  "name": "hnsw",
+                                  "space_type": "l2",
+                                  "engine": "faiss"
+                              }
+                          }
+                      }
+                  }
+              }
+
+              headers = {"Content-Type": "application/json"}
+              
+              logger.info(f"Attempting to create index {product_info_index_name}")
+              logger.info(f"Request URL: {product_info_index_url}")
+              logger.info(f"Request body: {json.dumps(index_body)}")
+              
+              try:
+                  response = requests.put(product_info_index_url, auth=awsauth, json=index_body, headers=headers)
+                  logger.info(f"Index creation response status: {response.status_code}")
+                  logger.info(f"Index creation response body: {response.text}")
+                  response.raise_for_status()
+              except requests.exceptions.RequestException as e:
+                  logger.error(f"Request failed: {e}")
+                  if hasattr(e, 'response'):
+                      logger.error(f"Response status code: {e.response.status_code}")
+                      logger.error(f"Response body: {e.response.text}")
+                  raise
+
+              logger.info(f"Attempting to create index {pet_care_index_name}")
+              logger.info(f"Request URL: {pet_care_index_url}")
+              logger.info(f"Request body: {json.dumps(index_body)}")
+              
+              try:
+                  response = requests.put(pet_care_index_url, auth=awsauth, json=index_body, headers=headers)
+                  logger.info(f"Index creation response status: {response.status_code}")
+                  logger.info(f"Index creation response body: {response.text}")
+                  response.raise_for_status()
+              except requests.exceptions.RequestException as e:
+                  logger.error(f"Request failed: {e}")
+                  if hasattr(e, 'response'):
+                      logger.error(f"Response status code: {e.response.status_code}")
+                      logger.error(f"Response body: {e.response.text}")
+                  raise
+
+          def delete_index(endpoint, product_info_index_name, pet_care_index_name, awsauth):
+              product_info_index_url = f'{endpoint}/{product_info_index_name}'
+              pet_care_index_url = f'{endpoint}/{pet_care_index_name}'
+
+              logger.info(f"Attempting to delete index {product_info_index_name}")
+              logger.info(f"Request URL: {product_info_index_url}")
+
+              try:
+                  response = requests.delete(product_info_index_url, auth=awsauth)
+                  logger.info(f"Index deletion response status: {response.status_code}")
+                  logger.info(f"Index deletion response body: {response.text}")
+                  if response.status_code != 404:  # Ignore 404 errors on delete
+                      response.raise_for_status()
+              except requests.exceptions.RequestException as e:
+                  logger.error(f"Request failed: {e}")
+                  if hasattr(e, 'response'):
+                      logger.error(f"Response status code: {e.response.status_code}")
+                      logger.error(f"Response body: {e.response.text}")
+                  if response.status_code != 404:  # Ignore 404 errors on delete
+                      raise
+
+              logger.info(f"Attempting to delete index {pet_care_index_name}")
+              logger.info(f"Request URL: {pet_care_index_url}")
+
+              try:
+                  response = requests.delete(pet_care_index_url, auth=awsauth)
+                  logger.info(f"Index deletion response status: {response.status_code}")
+                  logger.info(f"Index deletion response body: {response.text}")
+                  if response.status_code != 404:  # Ignore 404 errors on delete
+                      response.raise_for_status()
+              except requests.exceptions.RequestException as e:
+                  logger.error(f"Request failed: {e}")
+                  if hasattr(e, 'response'):
+                      logger.error(f"Response status code: {e.response.status_code}")
+                      logger.error(f"Response body: {e.response.text}")
+                  if response.status_code != 404:  # Ignore 404 errors on delete
+                      raise              
+
+      Runtime: python3.12
+      Timeout: 300
+      MemorySize: 256
+
+  OpenSearchServerlessCollectionPolicyAttachment:
+    Type: Custom::OpenSearchServerlessCollectionPolicyAttachment
+    Properties:
+      ServiceToken: !GetAtt AttachPolicyLambda.Arn
+      CollectionName: !Ref AOSSCollectionName
+      PolicyName: !Ref DataAccessPolicy
+      SolutionAccessRoleArn: !Ref SolutionAccessRoleArn
+    DependsOn: 
+      - Collection
+
+  AttachPolicyLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !Ref SolutionAccessRoleArn
+      Code:
+        ZipFile: |
+          # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+          # SPDX-License-Identifier: MIT-0
+          
+          import boto3
+          import cfnresponse
+          import json
+          import traceback
+          import time
+          import random
+          import string
+          import base64
+
+          def generate_policy_version():
+              timestamp = int(time.time())
+              random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+              version_string = f"{timestamp}-{random_string}"
+              return base64.b64encode(version_string.encode()).decode().rstrip('=')
+
+          def handler(event, context):
+              client = boto3.client('opensearchserverless')
+              
+              try:
+                  print(f"Received event: {json.dumps(event)}")
+                  
+                  if event['RequestType'] in ['Create', 'Update']:
+                      policy_name = event['ResourceProperties']['PolicyName']
+                      if policy_name.startswith('data|'):
+                          policy_name = policy_name.split('|')[1]
+                          print(f"Trimmed policy name to: {policy_name}")
+                      collection_name = event['ResourceProperties']['CollectionName']
+                      iam_role_arn = event['ResourceProperties']['SolutionAccessRoleArn']
+
+                      # Generate a new policy version
+                      policy_version = generate_policy_version()
+                      print(f"Generated policy version: {policy_version}")
+
+                      print(f"IAM Role ARN: {iam_role_arn}")
+                      # Get the latest policy to avoid version conflicts
+                      existing_policy = client.get_access_policy(name=policy_name, type='data')
+                      print(f"existing Policy content: {json.dumps(existing_policy)}")
+
+                      latest_version = existing_policy['accessPolicyDetail']['policyVersion']
+
+                      print(f"Latest policy version: {latest_version}")
+
+                      # Define the policy
+                      policy = [{
+                          "Rules": [{
+                              "ResourceType": "collection",
+                              "Resource": [f"collection/{collection_name}"],
+                              "Permission": ["aoss:*"]
+                          },
+                          {
+                              "ResourceType": "index",
+                              "Resource": [f"index/{collection_name}/*"],
+                              "Permission": [
+                                "aoss:CreateIndex",
+                                "aoss:UpdateIndex",
+                                "aoss:DescribeIndex",
+                                "aoss:ReadDocument",
+                                "aoss:WriteDocument",
+                                "aoss:*"
+                            ]
+                          }],
+                          "Principal": [iam_role_arn]
+                      }]
+                      
+                      print(f"Updating policy: {policy_name}")
+                      print(f"Policy content: {json.dumps(policy)}")
+                      
+                      # Update the policy
+                      response = client.update_access_policy(
+                          name=policy_name,
+                          type='data',
+                          description='Updated by CloudFormation',
+                          policy=json.dumps(policy),
+                          policyVersion=latest_version
+                      )
+                      
+                      print(f"Update policy response: {json.dumps(response)}")
+                  
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              except Exception as e:
+                  print(f"Error: {str(e)}")
+                  print(f"Traceback: {traceback.format_exc()}")
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {"Error": str(e)})
+
+      Runtime: python3.12
+      Timeout: 60
+      MemorySize: 128
+
+  ProductInfoKnowledgeBase:
+    Type: AWS::Bedrock::KnowledgeBase
+    DependsOn:
+      - VectorIndexUpdate
+    Properties:
+      Name: !Ref ProductInfo1stKnowledgeBaseName
+      Description: 'Product information knowledge base containing: a product catalog providing product descriptions, customer advantages, and detailed product specifications.'
+      RoleArn: !Ref SolutionAccessRoleArn
+      KnowledgeBaseConfiguration:
+        Type: "VECTOR"
+        VectorKnowledgeBaseConfiguration:
+          EmbeddingModelArn: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0"
+      StorageConfiguration:
+        Type: "OPENSEARCH_SERVERLESS"
+        OpensearchServerlessConfiguration:
+          CollectionArn: !GetAtt Collection.Arn
+          VectorIndexName: product_info_index
+          FieldMapping:
+            VectorField: "vector"
+            TextField: "text"
+            MetadataField: "metadata"
+
+  S3DataSource:
+    Type: AWS::Bedrock::DataSource
+    Properties:
+      KnowledgeBaseId: !Ref ProductInfoKnowledgeBase
+      Name: 'S3DataSource'
+      DataSourceConfiguration:
+        Type: "S3"
+        S3Configuration:
+          BucketArn: !Ref DataBucketForKnowledgeArn
+          InclusionPrefixes:
+            - !Ref DataBucketInclusionPrefix
+
+  PetCareKnowledgeBase:
+    Type: AWS::Bedrock::KnowledgeBase
+    DependsOn:
+      - VectorIndexUpdate
+    Properties:
+      Name: !Ref PetCare2ndKnowledgeBaseName
+      Description: 'Pet care advice knowledge base containing reference sources which should be the only authoritative references on pet caring information.'
+      RoleArn: !Ref SolutionAccessRoleArn
+      KnowledgeBaseConfiguration:
+        Type: "VECTOR"
+        VectorKnowledgeBaseConfiguration:
+          EmbeddingModelArn: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0"
+      StorageConfiguration:
+        Type: "OPENSEARCH_SERVERLESS"
+        OpensearchServerlessConfiguration:
+          CollectionArn: !GetAtt Collection.Arn
+          VectorIndexName: pet_care_index
+          FieldMapping:
+            VectorField: "vector"
+            TextField: "text"
+            MetadataField: "metadata"
+
+  WebCrawlerTrigger:
+    Type: Custom::WebCrawlerTrigger
+    Properties:
+      ServiceToken: !GetAtt WebCrawlerCreateLambda.Arn
+      KnowledgeBaseId: !Ref PetCareKnowledgeBase
+      SeedUrls:
+        - "https://en.wikipedia.org/wiki/Cat_food"
+        - "https://en.wikipedia.org/wiki/Cat_play_and_toys"
+        - "https://en.wikipedia.org/wiki/Dog_food"
+        - "https://en.wikipedia.org/wiki/Dog_grooming"
+
+  WebCrawlerCreateLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Role: !Ref SolutionAccessRoleArn
+      Runtime: python3.12
+      Timeout: 60
+      Code:
+        ZipFile: |
+          # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+          # SPDX-License-Identifier: MIT-0
+          
+          import boto3
+          import cfnresponse
+          import traceback
+          import json
+
+          def handler(event, context):
+              print("Received event:", json.dumps(event))
+              try:
+                  if event['RequestType'] in ['Create', 'Update']:
+                      kb_id = event['ResourceProperties']['KnowledgeBaseId']
+                      seed_urls = event['ResourceProperties']['SeedUrls']
+
+                      bedrock = boto3.client('bedrock-agent')
+
+                      response = bedrock.create_data_source(
+                          knowledgeBaseId=kb_id,
+                          name='WebCrawlerDataSource',
+                          dataSourceConfiguration={
+                              'type': 'WEB',
+                              'webConfiguration': {
+                                  'sourceConfiguration': {
+                                      'urlConfiguration': {
+                                          'seedUrls': [{'url': u} for u in seed_urls]
+                                      }
+                                  },
+                                  'crawlerConfiguration': {
+                                      'inclusionFilters': [".*"]
+                                  }
+                              }
+                          }
+                      )
+                      print("CreateDataSource response:", response)
+
+                      data_source_id = response['dataSource']['dataSourceId']
+                      start_response = bedrock.start_ingestion_job(
+                          knowledgeBaseId=kb_id,
+                          dataSourceId=data_source_id
+                      )
+                      print("StartIngestionJob response:", start_response)
+
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              except Exception as e:
+                  print("Error:", str(e))
+                  print(traceback.format_exc())
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {"Message": str(e)})
+
+  PetStoreGuardrail:
+    Type: AWS::Bedrock::Guardrail
+    Properties:
+      Name: !Ref GuardrailName
+      Description: Guardrail for virtual pet store agent to ensure compliance with business rules
+      CrossRegionConfig:
+        GuardrailProfileArn: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:guardrail-profile/us.guardrail.v1:0"
+      BlockedInputMessaging: |
+        {
+          "status": "Reject",
+          "message": "Sorry! We can't accept your request. What else do you need?"
+        }
+      BlockedOutputsMessaging: |
+        {
+          "status": "Reject",
+          "message": "Sorry! We can't process this response. Please try again."
+        }
+      ContentPolicyConfig:
+        ContentFiltersTierConfig:
+          TierName: STANDARD
+        FiltersConfig:
+          - Type: HATE
+            InputAction: BLOCK
+            InputEnabled: true
+            InputModalities:
+              - TEXT
+            InputStrength: HIGH
+            OutputAction: NONE
+            OutputEnabled: false
+            OutputModalities:
+              - TEXT
+            OutputStrength: NONE
+          - Type: INSULTS
+            InputAction: BLOCK
+            InputEnabled: true
+            InputModalities:
+              - TEXT
+            InputStrength: HIGH
+            OutputAction: NONE
+            OutputEnabled: false
+            OutputModalities:
+              - TEXT
+            OutputStrength: NONE
+          - Type: SEXUAL
+            InputAction: BLOCK
+            InputEnabled: true
+            InputModalities:
+              - TEXT
+            InputStrength: HIGH
+            OutputAction: NONE
+            OutputEnabled: false
+            OutputModalities:
+              - TEXT
+            OutputStrength: NONE
+          - Type: VIOLENCE
+            InputAction: BLOCK
+            InputEnabled: true
+            InputModalities:
+              - TEXT
+            InputStrength: HIGH
+            OutputAction: NONE
+            OutputEnabled: false
+            OutputModalities:
+              - TEXT
+            OutputStrength: NONE
+          - Type: MISCONDUCT
+            InputAction: BLOCK
+            InputEnabled: true
+            InputModalities:
+              - TEXT
+            InputStrength: HIGH
+            OutputAction: NONE
+            OutputEnabled: false
+            OutputModalities:
+              - TEXT
+            OutputStrength: NONE
+          - Type: PROMPT_ATTACK
+            InputAction: BLOCK
+            InputEnabled: true
+            InputModalities:
+              - TEXT
+            InputStrength: HIGH
+            OutputAction: NONE
+            OutputEnabled: false
+            OutputModalities:
+              - TEXT
+            OutputStrength: NONE
+      TopicPolicyConfig:
+        TopicsTierConfig:
+          TierName: STANDARD
+        TopicsConfig:
+          - Name: Beyond-specialization-advice
+            Definition: Beyond-specialization-advice covers the care and keeping of birds, fish, and reptiles.
+            Examples:
+              - How do I care for my parrot?
+              - What temperature should I keep my fish tank?
+              - How often should I feed my snake?
+            Type: DENY
+            InputAction: BLOCK
+            InputEnabled: true
+            OutputAction: NONE
+            OutputEnabled: false
+
+  PetStoreGuardrailVersion:
+    Type: AWS::Bedrock::GuardrailVersion
+    Properties:
+      GuardrailIdentifier: !GetAtt PetStoreGuardrail.GuardrailId
+      Description: Version 1 of Pet Store Guardrail
+           
+Outputs:
+  PetStoreCollectionURL:
+    Value: !GetAtt Collection.DashboardEndpoint
+  PetStoreCollectionARN:
+    Value: !GetAtt Collection.Arn
+  ProductInfo1stKnowledgeBaseId:
+    Description: 1st Knowledge Base ID for Virtual Pet Store Product Information
+    Value: !Ref ProductInfoKnowledgeBase
+  PetCare2ndKnowledgeBaseId:
+    Description: 2nd Knowledge Base ID for Virtual Pet Store Careing Information
+    Value: !Ref PetCareKnowledgeBase
+  PetStoreGuardrailId:
+    Description: Bedrock Guardrail ID for Pet Store Agent
+    Value: !GetAtt PetStoreGuardrail.GuardrailId
+  PetStoreGuardrailVersion:
+    Description: Bedrock Guardrail Version for Pet Store Agent
+    Value: !GetAtt PetStoreGuardrailVersion.Version
