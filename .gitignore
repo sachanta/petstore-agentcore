@@ -1,0 +1,27 @@
+# Terraform provider binaries and cache — large files, OS-specific
+.terraform/providers/
+.terraform/plugins/
+
+# Terraform state — contains sensitive data, should use remote backend in production
+terraform.tfstate
+terraform.tfstate.backup
+
+# Local overrides
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Temporary build artifacts
+terraform/modules/*/tmp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/

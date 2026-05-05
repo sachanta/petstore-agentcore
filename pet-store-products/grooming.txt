@@ -1,0 +1,128 @@
+VIRTUAL PET STORE - PET GROOMING PRODUCT CATALOG
+
+================================================================================
+Product ID: GR001
+Product Name: FoamFresh Dog Shampoo
+Category: Dog Shampoo
+Price: $18.99
+Package Size: 16 oz bottle
+
+Description:
+FoamFresh is a soap-free, hypoallergenic dog shampoo formulated with oatmeal and aloe vera. Safe for weekly use, it soothes itchy, sensitive skin while thoroughly cleaning coats of all types. pH balanced specifically for dogs — not suitable for cats.
+
+Specifications:
+- Volume: 16 oz (473 ml)
+- Formula: Soap-free, hypoallergenic
+- Key Ingredients: Colloidal oatmeal, aloe vera, chamomile extract
+- pH: Balanced for dog skin (6.5-7.5)
+- Suitable For: Dogs only, all coat types
+- Frequency: Safe for weekly use
+- Tear-Free: Yes
+
+Customer Advantages:
+- Oatmeal and aloe vera soothe dry, itchy, or inflamed skin
+- Soap-free formula does not strip natural coat oils
+- Tear-free formula safe for washing near face and eyes
+- Safe for dogs with allergies or skin sensitivities
+- Produces rich lather that rinses out completely
+
+================================================================================
+Product ID: GR002
+Product Name: GentleGlow Cat Shampoo
+Category: Cat Shampoo
+Price: $16.99
+Package Size: 12 oz bottle
+
+Description:
+GentleGlow is a waterless dry cat shampoo designed for cats who resist bathing. The foam formula refreshes the coat, removes dander, and neutralizes odors without any rinsing required. Simply apply, massage in, and towel dry. Safe for all cat breeds and coat types.
+
+Specifications:
+- Volume: 12 oz (355 ml)
+- Formula: Waterless foam, no rinse required
+- Key Ingredients: Panthenol, vitamin E, chamomile, aloe vera
+- Suitable For: Cats only, all coat types
+- Frequency: Safe for use 2-3 times per week
+- Alcohol-Free: Yes
+- Fragrance: Light lavender
+
+Customer Advantages:
+- No water required — ideal for cats who fear bathing
+- Reduces dander, beneficial for owners with mild cat allergies
+- Panthenol and vitamin E condition and add shine to coat
+- Alcohol-free formula gentle on skin
+- Convenient for quick freshening between full baths
+
+================================================================================
+Product ID: GR003
+Product Name: ProShine Deshedding Brush
+Category: Pet Grooming Tools
+Price: $27.99
+Package Size: Single unit
+
+Description:
+The ProShine Deshedding Brush features a stainless steel fine-tooth edge that reaches through the topcoat to safely remove loose undercoat hair without cutting skin or damaging the healthy coat. Effective for both dogs and cats with short, medium, or long coats. Reduces shedding by up to 90%.
+
+Specifications:
+- Blade: Stainless steel fine-tooth deshedding edge
+- Handle: Ergonomic non-slip rubber grip
+- Blade Width: 4 inches
+- Suitable For: Dogs and cats, all coat types
+- Ejector Button: Yes (one-click hair release)
+- Replaceable Blade: Yes
+
+Customer Advantages:
+- Reduces shedding by up to 90% with regular use
+- One-click ejector button cleans brush in seconds
+- Ergonomic handle reduces wrist and hand strain
+- Safe stainless steel edge does not cut skin or healthy fur
+- Works on short, medium, and long coats for dogs and cats
+
+================================================================================
+Product ID: GR004
+Product Name: PawPerfect Nail Grinder
+Category: Pet Grooming Tools
+Price: $32.99
+Package Size: Single unit
+
+Description:
+PawPerfect is a whisper-quiet electric nail grinder that smoothly files down pet nails without the cracking or splitting caused by traditional clippers. Features 3 grinding ports (small, medium, large) and 2 speed settings. Rechargeable via USB-C. Suitable for dogs and cats.
+
+Specifications:
+- Speeds: 2 (low: 6,000 RPM, high: 12,000 RPM)
+- Grinding Ports: 3 sizes (small, medium, large)
+- Noise Level: Under 50 dB
+- Battery: Rechargeable lithium-ion (via USB-C)
+- Charge Time: 2 hours
+- Run Time: Up to 3 hours per charge
+- Suitable For: Dogs and cats of all sizes
+
+Customer Advantages:
+- Quiet motor reduces pet anxiety compared to clipper sounds
+- Smooth grinding eliminates sharp edges left by clippers
+- 3 port sizes accommodate all nail thicknesses
+- USB-C rechargeable — no batteries required
+- Safety cap prevents over-grinding and accidental injury
+
+================================================================================
+Product ID: GR005
+Product Name: SpaDay Pet Grooming Bundle
+Category: Grooming Bundles
+Price: $79.99
+Package Size: Bundle of 5 items
+
+Description:
+The SpaDay Pet Grooming Bundle brings together five must-have grooming essentials in a single discounted package. Includes FoamFresh Dog Shampoo (GR001), GentleGlow Cat Shampoo (GR002), ProShine Deshedding Brush (GR003), PawPerfect Nail Grinder (GR004), and a premium microfiber drying towel. Perfect for households with both dogs and cats.
+
+Included Items:
+- 1x FoamFresh Dog Shampoo (16 oz)
+- 1x GentleGlow Cat Shampoo (12 oz)
+- 1x ProShine Deshedding Brush
+- 1x PawPerfect Nail Grinder
+- 1x Premium Microfiber Pet Towel (40" x 28")
+
+Customer Advantages:
+- Save over $37 compared to purchasing each item separately
+- Complete grooming solution for households with dogs and cats
+- All items selected for safety, quality, and ease of use
+- Premium microfiber towel absorbs 5x its weight in water
+- Presented in a reusable gift box — great for pet lovers

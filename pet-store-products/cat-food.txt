@@ -1,0 +1,136 @@
+VIRTUAL PET STORE - CAT FOOD PRODUCT CATALOG
+
+================================================================================
+Product ID: CM001
+Product Name: Meow Munchies
+Category: Dry Cat Food
+Price: $42.99
+Package Size: 20 lb bag
+
+Description:
+Meow Munchies is a premium dry cat food formulated with real chicken as the first ingredient. Designed to meet the nutritional needs of adult indoor cats, it supports healthy weight, digestion, and a shiny coat.
+
+Specifications:
+- Weight: 20 lb (9 kg)
+- Life Stage: Adult (1-7 years)
+- Breed Size: All breeds
+- Key Ingredients: Deboned chicken, brown rice, chicken meal, taurine, fish oil
+- Crude Protein: 34% minimum
+- Crude Fat: 15% minimum
+- Grain-Free: No
+- Artificial Preservatives: None
+
+Customer Advantages:
+- Real deboned chicken as the first ingredient
+- Added taurine for heart and eye health
+- L-carnitine supports healthy weight management for indoor cats
+- Omega-3 and Omega-6 fatty acids for a shiny coat
+- Crunchy kibble texture helps reduce tartar buildup
+
+================================================================================
+Product ID: CM002
+Product Name: Kitten Kickstart
+Category: Dry Cat Food
+Price: $29.99
+Package Size: 10 lb bag
+
+Description:
+Kitten Kickstart is a nutrient-dense dry food designed for kittens from weaning up to 12 months. High protein content and essential fatty acids support rapid growth, brain development, and healthy immune function.
+
+Specifications:
+- Weight: 10 lb (4.5 kg)
+- Life Stage: Kitten (0-12 months)
+- Breed Size: All breeds
+- Key Ingredients: Deboned turkey, salmon meal, peas, DHA, taurine
+- Crude Protein: 36% minimum
+- Crude Fat: 18% minimum
+- Grain-Free: Yes
+- Artificial Preservatives: None
+
+Customer Advantages:
+- DHA supports healthy brain and vision development
+- High protein content fuels kitten growth
+- Small kibble size appropriate for kitten mouths
+- Grain-free formula reduces risk of sensitivities
+- Veterinarian recommended for the first year of life
+
+================================================================================
+Product ID: CM003
+Product Name: Purrfect Pate Wet Cat Food
+Category: Wet Cat Food
+Price: $28.99
+Package Size: 24-pack (3 oz pouches)
+
+Description:
+Purrfect Pate is a smooth, grain-free wet cat food made with real tuna and salmon. Each single-serve pouch locks in moisture and freshness. Ideal for cats who prefer wet food or need extra hydration.
+
+Specifications:
+- Pack: 24 pouches x 3 oz
+- Life Stage: Adult
+- Breed Size: All breeds
+- Key Ingredients: Tuna, salmon, chicken broth, taurine, sunflower oil
+- Crude Protein: 12% minimum
+- Crude Fat: 4% minimum
+- Grain-Free: Yes
+- Artificial Preservatives: None
+
+Customer Advantages:
+- High moisture content supports urinary tract health
+- Single-serve pouches ensure freshness at every meal
+- No grains, artificial colors, or flavors
+- Smooth pate texture loved by finicky cats
+- Great for cats recovering from illness or with dental issues
+
+================================================================================
+Product ID: CM004
+Product Name: Senior Whiskers Formula
+Category: Dry Cat Food
+Price: $44.99
+Package Size: 18 lb bag
+
+Description:
+Senior Whiskers Formula is designed for cats aged 7 and older. Reduced phosphorus to support kidney health, added antioxidants for immune support, and easy-to-chew kibble for aging teeth.
+
+Specifications:
+- Weight: 18 lb (8.2 kg)
+- Life Stage: Senior (7+ years)
+- Breed Size: All breeds
+- Key Ingredients: Deboned salmon, oatmeal, sweet potato, glucosamine, vitamin E
+- Crude Protein: 28% minimum
+- Crude Fat: 10% minimum
+- Grain-Free: No
+- Artificial Preservatives: None
+
+Customer Advantages:
+- Reduced phosphorus to support kidney health in senior cats
+- Glucosamine for aging joint support
+- Antioxidant blend to boost immune function
+- Softer kibble texture is gentle on aging teeth
+- Omega-3s from salmon for healthy skin and coat
+
+================================================================================
+Product ID: CM005
+Product Name: Indoor Calm Blend
+Category: Dry Cat Food
+Price: $38.99
+Package Size: 16 lb bag
+
+Description:
+Indoor Calm Blend is specially crafted for adult indoor cats that live a less active lifestyle. Lower in calories to prevent weight gain, with added fiber for healthy digestion and L-tryptophan to support a calm temperament.
+
+Specifications:
+- Weight: 16 lb (7.3 kg)
+- Life Stage: Adult Indoor (1-10 years)
+- Breed Size: All breeds
+- Key Ingredients: Chicken, oatmeal, beet pulp, L-tryptophan, vitamin C
+- Crude Protein: 30% minimum
+- Crude Fat: 10% minimum
+- Grain-Free: No
+- Artificial Preservatives: None
+
+Customer Advantages:
+- Calorie-controlled formula prevents indoor cat weight gain
+- L-tryptophan promotes calm and relaxed behavior
+- Beet pulp fiber supports healthy gut and hairball control
+- No artificial preservatives or fillers
+- Supports healthy litter box habits

@@ -1,0 +1,136 @@
+VIRTUAL PET STORE - DOG FOOD PRODUCT CATALOG
+
+================================================================================
+Product ID: DD006
+Product Name: Doggy Delights
+Category: Dry Dog Food
+Price: $54.99
+Package Size: 30 lb bag
+
+Description:
+Doggy Delights is a premium grain-free dry dog food crafted for adult dogs of all breeds. Real meat is the first ingredient, ensuring high-quality protein in every bite. Free from artificial preservatives, colors, and fillers.
+
+Specifications:
+- Weight: 30 lb (13.6 kg)
+- Life Stage: Adult
+- Breed Size: All breeds
+- Key Ingredients: Deboned chicken, sweet potato, peas, chicken fat, salmon oil
+- Crude Protein: 32% minimum
+- Crude Fat: 18% minimum
+- Grain-Free: Yes
+- Artificial Preservatives: None
+
+Customer Advantages:
+- Real meat as the first ingredient for high protein content
+- Grain-free formula ideal for dogs with sensitivities
+- Omega-3 and Omega-6 fatty acids for a healthy coat
+- No artificial colors, flavors, or preservatives
+- Supports healthy digestion with added probiotics
+
+================================================================================
+Product ID: DD007
+Product Name: PuppyPower Bites
+Category: Dry Dog Food
+Price: $39.99
+Package Size: 15 lb bag
+
+Description:
+PuppyPower Bites is specially formulated for puppies up to 12 months old. Enriched with DHA for brain development and calcium for strong bones. Small kibble size makes it easy for young mouths to chew.
+
+Specifications:
+- Weight: 15 lb (6.8 kg)
+- Life Stage: Puppy (0-12 months)
+- Breed Size: Small to Medium breeds
+- Key Ingredients: Deboned turkey, brown rice, peas, flaxseed, DHA
+- Crude Protein: 30% minimum
+- Crude Fat: 20% minimum
+- Grain-Free: No
+- Artificial Preservatives: None
+
+Customer Advantages:
+- DHA supports healthy brain and eye development
+- Calcium and phosphorus for strong teeth and bones
+- Small kibble size perfect for puppy mouths
+- Balanced nutrition for growth stages
+- Veterinarian recommended formula
+
+================================================================================
+Product ID: DD008
+Product Name: Senior Serenity Blend
+Category: Dry Dog Food
+Price: $49.99
+Package Size: 25 lb bag
+
+Description:
+Senior Serenity Blend is a specially formulated dry dog food for dogs aged 7 and older. Lower in calories to prevent weight gain, enriched with glucosamine and chondroitin for joint health, and easy to digest.
+
+Specifications:
+- Weight: 25 lb (11.3 kg)
+- Life Stage: Senior (7+ years)
+- Breed Size: All breeds
+- Key Ingredients: Deboned salmon, oatmeal, barley, glucosamine, chondroitin
+- Crude Protein: 24% minimum
+- Crude Fat: 12% minimum
+- Grain-Free: No
+- Artificial Preservatives: None
+
+Customer Advantages:
+- Glucosamine and chondroitin support aging joints
+- Reduced calorie formula to maintain healthy weight
+- Easily digestible ingredients for sensitive senior stomachs
+- Omega-3s from salmon for healthy skin and coat
+- Antioxidant-rich formula to support immune health
+
+================================================================================
+Product ID: DD009
+Product Name: Hearty Stew Wet Dog Food
+Category: Wet Dog Food
+Price: $34.99
+Package Size: 12-pack (12.5 oz cans)
+
+Description:
+Hearty Stew is a chunky wet dog food made with real beef, carrots, and potatoes slow-cooked in a savory broth. No thickeners or meat by-products. Perfect as a complete meal or mixed with dry food.
+
+Specifications:
+- Pack: 12 cans x 12.5 oz
+- Life Stage: Adult
+- Breed Size: All breeds
+- Key Ingredients: Beef, potatoes, carrots, peas, beef broth
+- Crude Protein: 8% minimum
+- Crude Fat: 5% minimum
+- Grain-Free: Yes
+- Artificial Preservatives: None
+
+Customer Advantages:
+- High moisture content supports hydration
+- Real chunky meat and vegetables visible in every can
+- No meat by-products or artificial thickeners
+- Great for picky eaters or dogs transitioning from dry food
+- Resealable lid included for easy storage
+
+================================================================================
+Product ID: DD010
+Product Name: Mega Feast Bundle Pack
+Category: Dry Dog Food
+Price: $119.99
+Package Size: 3 x 30 lb bags
+
+Description:
+The Mega Feast Bundle Pack is the best value for multi-dog households or large breed owners. Three 30 lb bags of our top-selling Doggy Delights formula at a bundled price, saving you money on every order.
+
+Specifications:
+- Weight: 3 x 30 lb bags (90 lb total)
+- Life Stage: Adult
+- Breed Size: All breeds
+- Key Ingredients: Same as Doggy Delights (DD006)
+- Crude Protein: 32% minimum
+- Crude Fat: 18% minimum
+- Grain-Free: Yes
+- Artificial Preservatives: None
+
+Customer Advantages:
+- Best per-pound value in our dog food range
+- Ideal for households with multiple dogs or large breeds
+- Same premium Doggy Delights formula in bulk
+- Reduces reorder frequency
+- Free shipping always applies at this price point
