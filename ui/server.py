@@ -8,6 +8,9 @@ import logging
 import os
 import re
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import boto3
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
