@@ -7,6 +7,16 @@ module "foundation" {
   aws_region     = var.aws_region
   aws_account_id = data.aws_caller_identity.current.account_id
 
-  product_files = fileset("${path.root}/../pet-store-products", "*.txt")
+  product_files      = fileset("${path.root}/../pet-store-products", "*.txt")
   product_files_path = "${path.root}/../pet-store-products"
+}
+
+module "aoss" {
+  source = "./modules/aoss"
+
+  project_name             = var.project_name
+  aws_region               = var.aws_region
+  aws_account_id           = data.aws_caller_identity.current.account_id
+  solution_access_role_arn = module.foundation.solution_access_role_arn
+  collection_name          = "clashofagents"
 }

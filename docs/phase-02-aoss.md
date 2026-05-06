@@ -145,6 +145,61 @@ aws opensearchserverless list-collections \
 
 ---
 
+## Execution Log
+
+### Apply (final successful run)
+```
+# terraform apply -auto-approve
+
+module.aoss.aws_opensearchserverless_security_policy.encryption: Creating...
+module.aoss.aws_opensearchserverless_security_policy.network: Creating...
+module.aoss.aws_opensearchserverless_access_policy.data: Creating...
+module.aoss.aws_opensearchserverless_collection.main: Creating...
+module.aoss.time_sleep.aoss_policy_propagation: Creating...  [60s]
+module.aoss.null_resource.vector_indices: Creating...
+  product_info_index → Response 200: {"acknowledged":true,...}
+  pet_care_index     → Response 200: {"acknowledged":true,...}
+
+Apply complete! Resources: 16 added, 0 changed, 0 destroyed.
+
+Outputs:
+  aoss_collection_arn      = "arn:aws:aoss:us-east-1:040504913362:collection/5nvu2ztxn21jrclpdvdi"
+  aoss_collection_endpoint = "https://5nvu2ztxn21jrclpdvdi.us-east-1.aoss.amazonaws.com"
+  knowledge_bucket_name    = "petstore-knowledge-data-040504913362"
+  solution_access_role_arn = "arn:aws:iam::040504913362:role/HCL-User-Role-PD-BedrockAgentCoreRole"
+```
+
+### Destroy
+```
+# terraform destroy -auto-approve
+
+module.aoss.null_resource.vector_indices: Destroying...   (on_failure=continue — 403 OK, collection will be deleted anyway)
+module.aoss.aws_opensearchserverless_collection.main: Destroying...  [~30s]
+module.aoss.aws_opensearchserverless_security_policy.*: Destroying...
+module.aoss.aws_opensearchserverless_access_policy.data: Destroying...
+
+Destroy complete! Resources: 16 destroyed.
+```
+
+### Errors Encountered and Fixed
+
+**Error 1: ModuleNotFoundError (boto3)**
+The first apply failed because `boto3` / `requests` were not installed.
+```bash
+pip3 install boto3 requests requests-aws4auth
+```
+
+**Error 2: 403 on index creation**
+Root cause: AOSS data access policy was applied, but the `null_resource` ran immediately before the policy propagated (~60 s delay).
+Fix: Added `time_sleep.aoss_policy_propagation` (60 s) between policy creation and `null_resource`.
+Also added the EC2 instance role (`HCL-User-Role-Aiml-EC2`) to the data access policy Principal list, because the local-exec script authenticates as that role.
+
+**Error 3: 403 on index deletion (destroy)**
+The destroy provisioner runs without a propagation wait and gets 403 — this is expected.
+`on_failure = continue` allows destroy to proceed. Terraform then deletes the collection, which removes the indices implicitly.
+
+---
+
 ## For Srikar's Understanding
 
 ### Homework

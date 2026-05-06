@@ -22,3 +22,13 @@ output "codebuild_bucket_name" {
   description = "S3 bucket name used as CodeBuild source staging area"
   value       = module.foundation.codebuild_bucket_name
 }
+
+output "aoss_collection_arn" {
+  description = "ARN of the AOSS vector search collection"
+  value       = module.aoss.collection_arn
+}
+
+output "aoss_collection_endpoint" {
+  description = "HTTPS endpoint of the AOSS collection"
+  value       = module.aoss.collection_endpoint
+}
