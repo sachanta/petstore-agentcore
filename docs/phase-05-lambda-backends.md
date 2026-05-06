@@ -208,6 +208,41 @@ aws logs tail /aws/lambda/PetStoreInventoryManagementFunction --follow
 
 ---
 
+## Execution Log
+
+### `terraform apply` — Clean on first attempt
+
+**IAM adaptation:** The phase doc planned to create `PetStoreInventoryLambdaRole` / `PetStoreUserMgmtLambdaRole`. The `HCL-Permissions-Boundary` only allows `iam:CreateRole` on `AmazonBedrockExecution*`-named resources. Arbitrary Lambda role names would be denied. Used `solution_access_role_arn` (`HCL-User-Role-PD-BedrockAgentCoreRole`) as the execution role for both functions instead — it already has `logs:*` and the Lambda service can assume it.
+
+**Outputs:**
+```
+inventory_function_name       = "PetStoreInventoryManagementFunction"
+user_management_function_name = "PetStoreUserManagementFunction"
+```
+
+### Manual invocation tests — All passed
+
+```bash
+# Inventory by product code
+aws lambda invoke --function-name PetStoreInventoryManagementFunction \
+  --payload '{"function":"getInventory","parameters":[{"name":"product_code","value":"DD006"}]}'
+# → { product_code: DD006, name: Doggy Delights, quantity: 150, status: in_stock, ... }
+
+# User by ID
+aws lambda invoke --function-name PetStoreUserManagementFunction \
+  --payload '{"function":"getUserById","parameters":[{"name":"user_id","value":"usr_001"}]}'
+# → { id: usr_001, name: John Doe, subscription_status: active, transactions: [...] }
+
+# User by email
+aws lambda invoke --function-name PetStoreUserManagementFunction \
+  --payload '{"function":"getUserByEmail","parameters":[{"name":"user_email","value":"jane.smith@virtualpetstore.com"}]}'
+# → { id: usr_002, name: Jane Smith, subscription_status: expired, ... }
+```
+
+Response nesting matches exactly what `inventory_management.py:65` and `user_management.py:71` expect.
+
+---
+
 ## For Srikar's Understanding
 
 ### Homework

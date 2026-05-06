@@ -18,6 +18,11 @@ variable "solution_access_role_arn" {
   type        = string
 }
 
+variable "kb_execution_role_arn" {
+  description = "ARN of the Bedrock KB execution role (needs data access for Bedrock to validate KB storage)"
+  type        = string
+}
+
 variable "collection_name" {
   description = "Name of the AOSS collection (must be lowercase alphanumeric + hyphens, max 32 chars)"
   type        = string

@@ -15,6 +15,107 @@ data "aws_iam_role" "codebuild" {
 }
 
 # ─────────────────────────────────────────────────────────────
+# Bedrock KB Execution Role
+# HCL-User-Role-PD-BedrockAgentCoreRole lacks aoss:APIAccessAll
+# (required for Bedrock to validate AOSS storage at KB creation
+# time), so we create a dedicated KB role.
+#
+# The permissions boundary (HCL-Permissions-Boundary) allows
+# iam:CreateRole / iam:PutRolePolicy on AmazonBedrockExecution*
+# resources that carry the AmazonBedrockManaged=true tag.
+# ─────────────────────────────────────────────────────────────
+
+resource "aws_iam_role" "kb_execution" {
+  name        = "AmazonBedrockExecutionRoleForKnowledgeBase_petstore"
+  description = "Execution role for petstore Bedrock Knowledge Bases"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AmazonBedrockKnowledgeBaseTrustPolicy"
+        Effect = "Allow"
+        Principal = {
+          Service = "bedrock.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.aws_account_id
+          }
+          ArnLike = {
+            "aws:SourceArn" = "arn:aws:bedrock:${var.aws_region}:${var.aws_account_id}:knowledge-base/*"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = {
+    AmazonBedrockManaged = "true"
+    Project              = var.project_name
+    Phase                = "1-foundation"
+  }
+}
+
+resource "aws_iam_role_policy" "kb_aoss" {
+  name = "AOSS-APIAccess"
+  role = aws_iam_role.kb_execution.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "aoss:APIAccessAll"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "kb_s3" {
+  name = "S3-KnowledgeBucket"
+  role = aws_iam_role.kb_execution.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.knowledge_data.arn,
+          "${aws_s3_bucket.knowledge_data.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "kb_bedrock" {
+  name = "Bedrock-EmbeddingModel"
+  role = aws_iam_role.kb_execution.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream"
+        ]
+        Resource = "arn:aws:bedrock:${var.aws_region}::foundation-model/amazon.titan-embed-text-v2:0"
+      }
+    ]
+  })
+}
+
+# ─────────────────────────────────────────────────────────────
 # S3 Bucket — knowledge data (product catalog files)
 # ─────────────────────────────────────────────────────────────
 

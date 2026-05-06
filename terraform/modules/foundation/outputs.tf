@@ -27,3 +27,8 @@ output "codebuild_bucket_name" {
   description = "S3 bucket name for CodeBuild source staging"
   value       = aws_s3_bucket.codebuild_staging.bucket
 }
+
+output "kb_execution_role_arn" {
+  description = "ARN of the Bedrock KB execution role (has aoss:APIAccessAll, trusted by bedrock.amazonaws.com)"
+  value       = aws_iam_role.kb_execution.arn
+}

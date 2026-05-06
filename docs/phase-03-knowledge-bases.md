@@ -175,6 +175,76 @@ aws bedrock-agent get-knowledge-base --knowledge-base-id <id>
 
 ---
 
+## Execution Log
+
+### First `terraform apply`
+
+Both KBs created successfully. S3 ingestion (ProductInformation) completed. Web crawler ingestion started fire-and-forget.
+
+**Outputs:**
+```
+product_info_kb_id = "BEYAHUAP15"
+pet_care_kb_id     = "DN3XACFU6R"
+s3_data_source_id  = "3QZRRSNJM2"
+kb_execution_role_arn = "arn:aws:iam::040504913362:role/AmazonBedrockExecutionRoleForKnowledgeBase_petstore"
+aoss_collection_arn = "arn:aws:aoss:us-east-1:040504913362:collection/opv1xxshb0kl99ejbs7"
+```
+
+### Issue 1 — KB creation 403: `security_exception 403 Forbidden`
+
+**Error:** `ValidationException: The knowledge base storage configuration provided is invalid... Request failed: [security_exception] 403 Forbidden`
+
+**Root cause:** Bedrock needs to validate connectivity to AOSS during KB creation, using the role passed as `role_arn`. The originally planned role (`HCL-User-Role-PD-BedrockAgentCoreRole`) only has `bedrock:*`, `s3:*`, `es:*` in its policy — **no `aoss:*`**. Without `aoss:APIAccessAll`, AOSS returns a `security_exception 403` to Bedrock, which surfaces as a `ValidationException`.
+
+**Investigation:** Examined the existing `bedrock-knowledge-base-00z3ep` in the account — its AOSS data access policy grants `AmazonBedrockExecutionRoleForKnowledgeBase_s58un` (a Bedrock-generated role), confirming Bedrock uses its own service role, not the caller's identity.
+
+**Permissions boundary constraint:** The `HCL-Permissions-Boundary` blocks `iam:*` via `NotAction`, but explicitly allows `iam:CreateRole` and `iam:PutRolePolicy` on resources matching `AmazonBedrockExecution*` when tagged `AmazonBedrockManaged=true`.
+
+**Fix:** Created `aws_iam_role.kb_execution` in the foundation module:
+- Name: `AmazonBedrockExecutionRoleForKnowledgeBase_petstore`
+- Tag: `AmazonBedrockManaged = "true"` (required by permissions boundary)
+- Trust: `bedrock.amazonaws.com` with `SourceAccount` + `SourceArn` conditions
+- Inline policies: `aoss:APIAccessAll`, `s3:GetObject`/`ListBucket` on knowledge bucket, `bedrock:InvokeModel` on Titan Embed Text v2
+
+Added this role to the AOSS data access policy `Principal` list. Both KBs created successfully.
+
+### Issue 2 — `terraform destroy` blocked by running ingestion job
+
+**Error:** `ValidationException: There is an ingestion job running for the knowledge base with name PetCaringKnowledge.`
+
+**Root cause:** The web crawler ingestion job is started fire-and-forget during `apply`. When `destroy` runs shortly afterward, the crawl job is still `IN_PROGRESS`. Bedrock refuses to delete a KB with an active ingestion job.
+
+The `null_resource.webcrawler_datasource` destroy provisioner in `manage_webcrawler_datasource.py` only deleted the data source — it did not stop running ingestion jobs first. The KB resource itself then tried to delete and hit the error.
+
+**Fix:** Added `stop_running_ingestion_jobs(client, kb_id)` to `manage_webcrawler_datasource.py` destroy path:
+1. Enumerates all data sources on the KB
+2. Enumerates all ingestion jobs per data source
+3. Calls `stop_ingestion_job` for any in `STARTING` or `IN_PROGRESS` state
+4. Polls until all jobs reach a terminal state (up to 120s)
+
+This is called at the top of `delete_datasource()`, before deleting the data source.
+
+**Manual recovery:** The partial destroy left the PetCaringKnowledge KB (`283HA3I4KO`) in state. Manually stopped the ingestion job via boto3, then re-ran `terraform destroy` which completed cleanly.
+
+### Final `terraform destroy` — Clean
+
+All 6 remaining resources destroyed in order:
+```
+module.knowledge_bases.aws_bedrockagent_knowledge_base.pet_care  → destroyed (7s)
+module.aoss.aws_opensearchserverless_collection.main             → destroyed (31s)
+module.aoss.aws_opensearchserverless_access_policy.data          → destroyed
+module.aoss.aws_opensearchserverless_security_policy.*           → destroyed
+module.foundation.aws_iam_role.kb_execution                      → destroyed
+```
+
+### Final `terraform apply` — Clean
+
+`null_resource.webcrawler_datasource` was tainted (destroy provisioner ran during partial destroy), so it replaced itself. Data source already existed → idempotent create. New ingestion job started fire-and-forget.
+
+**Apply complete. 15 resources total (1 replaced).**
+
+---
+
 ## For Srikar's Understanding
 
 ### Homework

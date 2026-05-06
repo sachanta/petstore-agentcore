@@ -68,7 +68,8 @@ resource "aws_opensearchserverless_access_policy" "data" {
       # - EC2 role: used by the Terraform local-exec script that creates indices
       Principal   = [
         var.solution_access_role_arn,
-        "arn:aws:iam::${var.aws_account_id}:role/HCL-User-Role-Aiml-EC2"
+        "arn:aws:iam::${var.aws_account_id}:role/HCL-User-Role-Aiml-EC2",
+        var.kb_execution_role_arn,
       ]
       Rules = [
         {

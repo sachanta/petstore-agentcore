@@ -124,6 +124,31 @@ The Bedrock console has a guardrail test panel — use it before the agent is co
 
 ---
 
+## Execution Log
+
+### `terraform apply` — Clean on first attempt
+
+**Fix required during implementation:** The AWS provider `~5.82` schema for `aws_bedrock_guardrail` is simpler than the CloudFormation equivalent. Two mismatches:
+
+1. **`content_policy_config` uses `filters_config` blocks** (not `content_filter_config`), and only accepts `type`, `input_strength`, `output_strength`. Fields like `input_action`, `input_enabled`, `input_modalities` are not exposed in this provider version — the service sets defaults.
+
+2. **`topics_config.examples` is a `list(string)`**, not a block. Used `examples = [...]` instead of `example { }` sub-blocks.
+
+3. **`cross_region_config` not in provider schema** — omitted. The CloudFormation template had `CrossRegionConfig.GuardrailProfileArn` but the TF provider `~5.82` doesn't expose this block. The guardrail creates successfully without it.
+
+**Outputs:**
+```
+guardrail_id      = "rgwjkefgjc7s"
+guardrail_version = "1"
+guardrail_arn     = "arn:aws:bedrock:us-east-1:040504913362:guardrail/rgwjkefgjc7s"
+```
+
+### `terraform destroy` + `terraform apply` — Clean
+
+Destroy and re-apply completed cleanly in ~2 seconds each.
+
+---
+
 ## For Srikar's Understanding
 
 ### Homework
