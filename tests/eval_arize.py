@@ -506,7 +506,7 @@ def main():
     print(f"Uploading dataset ({len(DATASET)} cases)...")
     dataset = client.datasets.create_dataset(
         name="petstore-22-cases",
-        description="22 end-to-end test cases for the Pet Store AgentCore Runtime",
+        dataset_description="22 end-to-end test cases for the Pet Store AgentCore Runtime",
         inputs=[
             {"prompt": row["prompt"], "id": row["id"], "category": row["category"]}
             for row in DATASET
