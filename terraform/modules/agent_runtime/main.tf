@@ -45,6 +45,8 @@ resource "null_resource" "agent_runtime" {
     pet_care_kb_id      = var.pet_care_kb_id
     inventory_fn        = var.inventory_function_name
     user_mgmt_fn        = var.user_management_function_name
+    guardrail_id        = var.guardrail_id
+    guardrail_version   = var.guardrail_version
     region              = var.aws_region
   }
 
@@ -61,7 +63,9 @@ resource "null_resource" "agent_runtime" {
           KNOWLEDGE_BASE_1_ID=${var.product_info_kb_id} \
           KNOWLEDGE_BASE_2_ID=${var.pet_care_kb_id} \
           SYSTEM_FUNCTION_1_NAME=${var.inventory_function_name} \
-          SYSTEM_FUNCTION_2_NAME=${var.user_management_function_name}
+          SYSTEM_FUNCTION_2_NAME=${var.user_management_function_name} \
+          GUARDRAIL_ID=${var.guardrail_id} \
+          GUARDRAIL_VERSION=${var.guardrail_version}
     EOT
   }
 

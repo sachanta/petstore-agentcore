@@ -37,3 +37,13 @@ variable "user_management_function_name" {
   description = "Lambda function name for user management (SYSTEM_FUNCTION_2_NAME)"
   type        = string
 }
+
+variable "guardrail_id" {
+  description = "Bedrock Guardrail ID (GUARDRAIL_ID env var for the agent)"
+  type        = string
+}
+
+variable "guardrail_version" {
+  description = "Bedrock Guardrail published version (GUARDRAIL_VERSION env var)"
+  type        = string
+}

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT-0
 
 import os
+import re
 import json
 import logging
 from typing import Dict, List, Any
@@ -38,16 +39,16 @@ You are an online pet store assistant for staff. Your job is to analyze customer
 4. Generate final response in JSON based on all compiled information.
 
 # Business Rules:
-Don't ask for further information. You always need to generate a final response only. 
+Don't ask for further information. You always need to generate a final response only.
 Product identifiers are for internal use and must not appear in customer facing response messages.
 When preparing a customer response, use the customer's first name instead of user id or email address when possible.
-Return Error status with a user-friendly message starting with "We are sorry..." when encountering internal issues - such as system errors or missing data.
-Return Reject status with a user-friendly message starting with "We are sorry..." when requested products are unavailable.
+Return Reject status with a user-friendly message starting with "We are sorry..." ONLY when requested products are not found in our catalog (retrieve_product_info returns no results). Do NOT return Reject for low_stock items — low_stock means the item is still available to purchase, just running low. Only return Reject when the product truly does not exist in the catalog or is explicitly out_of_stock with quantity 0.
+Return Error status with a user-friendly message starting with "We are sorry..." only when encountering genuine internal system errors (tool call failures, unexpected exceptions).
 Return Accept status with appropriate customer message when requested product is available.
 Always avoid revealing technical system details in customer-facing message field when status is Accept, Error, or Reject.
 When an order can cause the remaining inventory to fall below or equal to the reorder level, flag that product for replenishment.
-Orders over $300 qualify for a 15% total discount. In addition, when buying multiple quantities of the same item, customers get 10% off on each additional unit (first item at regular price).
-Shipping charges are determined by order total and item quantity. Orders $75 or above: receive free shipping. Orders under $75 with 2 items or fewer: incur $14.95 flat rate. Orders under $75 with 3 items or more: incur $19.95 flat rate.
+Orders over $300 qualify for a 15% total discount (set additionalDiscount to 0.15). In addition, when buying multiple quantities of the same item, customers get 10% off on each additional unit (first item at regular price; set bundleDiscount to 0.10).
+Shipping charges are determined by the order subtotal (sum of all item prices × quantity, after bundle discounts) and the total number of units ordered (sum of all item quantities). Free shipping: subtotal $75 or above. Flat rate $14.95: subtotal under $75 and total units ordered ≤ 2. Flat rate $19.95: subtotal under $75 and total units ordered ≥ 3. Example: ordering 3 units of a $12.99 treat = subtotal $38.97, total units = 3 → $19.95 shipping. Ordering 1 unit of an $89.99 bed = subtotal $89.99 ≥ $75 → free shipping.
 Designate the customer type as Subscribed only when the user exists and maintains an active subscription. For all other cases, assume the customer type as Guest.
 Free pet care advice should only be provided when required to customers with active subscriptions in the allocated field for pet advice.
 For each item included in an order, determine whether to trigger the inventory replenishment flag based on the projected inventory quantities that will remain after the current order is fulfilled.
@@ -204,10 +205,10 @@ def create_agent():
     
     # Set up the model
     model = init_chat_model(
-        MODEL_ID, 
-        model_provider="bedrock-converse", 
-        region_name = os.environ.get('AWS_REGION', 'us-west-2'),
-        max_tokens = 4096
+        MODEL_ID,
+        model_provider="bedrock-converse",
+        region_name=os.environ.get('AWS_REGION', 'us-west-2'),
+        max_tokens=4096,
     )
                     
     # Create the prompt
@@ -255,7 +256,18 @@ def process_request(prompt):
         # Extract the final AI message
         ai_messages = [msg for msg in response["messages"] if isinstance(msg, AIMessage)]
         final_response = ai_messages[-1].content if ai_messages else "No response generated."
-        
+
+        # Handle list content (extended thinking blocks) — extract text only
+        if isinstance(final_response, list):
+            final_response = " ".join(
+                block.get("text", "") if isinstance(block, dict) else str(block)
+                for block in final_response
+            ).strip()
+
+        # Strip inline <thinking>...</thinking> reasoning tokens emitted by Nova Pro
+        if isinstance(final_response, str):
+            final_response = re.sub(r'<thinking>.*?</thinking>', '', final_response, flags=re.DOTALL).strip()
+
         return final_response
         
     except Exception as e:

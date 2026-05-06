@@ -50,6 +50,8 @@ module "agent_runtime" {
   pet_care_kb_id                = module.knowledge_bases.pet_care_kb_id
   inventory_function_name       = module.lambda_backends.inventory_function_name
   user_management_function_name = module.lambda_backends.user_management_function_name
+  guardrail_id                  = module.guardrail.guardrail_id
+  guardrail_version             = module.guardrail.guardrail_version
 }
 
 module "guardrail" {
