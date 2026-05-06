@@ -53,6 +53,16 @@ output "s3_data_source_id" {
   value       = module.knowledge_bases.s3_data_source_id
 }
 
+output "agent_runtime_id" {
+  description = "ID of the AgentCore Runtime"
+  value       = module.agent_runtime.agent_runtime_id
+}
+
+output "agent_runtime_arn" {
+  description = "ARN of the AgentCore Runtime"
+  value       = module.agent_runtime.agent_runtime_arn
+}
+
 output "ecr_image_uri" {
   description = "Full URI of the latest agent image in ECR"
   value       = module.agent_image.ecr_image_uri

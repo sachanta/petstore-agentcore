@@ -39,6 +39,19 @@ module "lambda_backends" {
   solution_access_role_arn = module.foundation.solution_access_role_arn
 }
 
+module "agent_runtime" {
+  source = "./modules/agent_runtime"
+
+  project_name                  = var.project_name
+  aws_region                    = var.aws_region
+  ecr_image_uri                 = module.agent_image.ecr_image_uri
+  solution_access_role_arn      = module.foundation.solution_access_role_arn
+  product_info_kb_id            = module.knowledge_bases.product_info_kb_id
+  pet_care_kb_id                = module.knowledge_bases.pet_care_kb_id
+  inventory_function_name       = module.lambda_backends.inventory_function_name
+  user_management_function_name = module.lambda_backends.user_management_function_name
+}
+
 module "guardrail" {
   source = "./modules/guardrail"
 

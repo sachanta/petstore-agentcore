@@ -185,6 +185,41 @@ aws bedrock-agentcore-control list-agent-runtimes \
 
 ---
 
+## Execution Log
+
+### `terraform apply` — Clean on first attempt
+
+Runtime created and READY in **23 seconds**.
+
+**Note on outputs:** Terraform's `file()` function is evaluated at plan time, so `agent_runtime_id` and `agent_runtime_arn` outputs show as empty strings on the first apply (the JSON file doesn't exist yet at plan time). A second `terraform apply` (no-op) reads the now-existing file and resolves the outputs correctly. This is an inherent limitation of `null_resource` + `file()` for output passing.
+
+**Runtime:**
+```
+agent_runtime_id  = "LangGraphAgentCoreRuntime-wl5A1CH151"
+agent_runtime_arn = "arn:aws:bedrock-agentcore:us-east-1:040504913362:runtime/LangGraphAgentCoreRuntime-wl5A1CH151"
+```
+
+### Smoke test — PASSED
+
+```
+Prompt: "What is the price of Doggy Delights?"
+
+Response:
+{
+  "status": "Accept",
+  "message": "Dear Customer! We offer our 30lb bag of Doggy Delights for just $54.99...",
+  "customerType": "Guest",
+  "items": [{ "productId": "DD006", "price": 54.99, "quantity": 1, "total": 54.99 }],
+  "shippingCost": 14.95,
+  "subtotal": 69.94,
+  "total": 69.94
+}
+```
+
+Agent correctly: retrieved price from ProductInformation KB, checked inventory (DD006 in stock), returned full order summary.
+
+---
+
 ## For Srikar's Understanding
 
 ### Homework
