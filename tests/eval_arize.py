@@ -18,11 +18,10 @@ import json
 import os
 import re
 import time
+from datetime import datetime, timezone
 
 import boto3
-import phoenix as px
-from phoenix.experiments import run_experiment
-from phoenix.experiments.evaluators import create_evaluator
+from phoenix.client import Client
 
 # ─────────────────────────────────────────────────────────────
 # Phoenix client — Arize cloud
@@ -388,72 +387,68 @@ def task(input: dict) -> dict:
 
 
 # ─────────────────────────────────────────────────────────────
-# Evaluators
+# Evaluators — plain functions; return float (0.0 or 1.0)
+# Phoenix v15 evaluators receive (output, expected) where:
+#   output   = what task() returned
+#   expected = the "outputs" row from the dataset
 # ─────────────────────────────────────────────────────────────
 
-@create_evaluator(name="status_match")
-def status_match(output: dict, expected: dict) -> float:
+def status_match(output, expected) -> float:
     """Did the agent return the expected status (Accept/Reject/Error)?"""
     return 1.0 if output.get("status") == expected.get("expected_status") else 0.0
 
 
-@create_evaluator(name="customer_type_match")
-def customer_type_match(output: dict, expected: dict) -> float:
-    """Did the agent correctly identify Guest vs Subscribed? Skipped if not expected."""
+def customer_type_match(output, expected) -> float:
+    """Did the agent correctly identify Guest vs Subscribed?"""
     exp = expected.get("expected_customer_type")
     if exp is None:
-        return 1.0  # not checked for this case
+        return 1.0
     return 1.0 if output.get("customerType") == exp else 0.0
 
 
-@create_evaluator(name="product_identified")
-def product_identified(output: dict, expected: dict) -> float:
+def product_identified(output, expected) -> float:
     """Did the agent return the expected product ID in the items list?"""
     exp_pid = expected.get("expected_product_id")
     if exp_pid is None:
-        return 1.0  # not checked
+        return 1.0
     items = output.get("items") or []
     return 1.0 if any(i.get("productId") == exp_pid for i in items) else 0.0
 
 
-@create_evaluator(name="shipping_correct")
-def shipping_correct(output: dict, expected: dict) -> float:
+def shipping_correct(output, expected) -> float:
     """Is the shippingCost within $0.10 of the expected value?"""
     exp = expected.get("expected_shipping")
     if exp is None:
-        return 1.0  # not checked
+        return 1.0
     actual = output.get("shippingCost")
     if actual is None:
         return 0.0
     return 1.0 if abs(float(actual) - float(exp)) < 0.10 else 0.0
 
 
-@create_evaluator(name="discount_correct")
-def discount_correct(output: dict, expected: dict) -> float:
+def discount_correct(output, expected) -> float:
     """Is the additionalDiscount correct?"""
     exp = expected.get("expected_additional_discount")
     if exp is None:
-        return 1.0  # not checked
+        return 1.0
     actual = output.get("additionalDiscount", 0.0)
     return 1.0 if abs(float(actual) - float(exp)) < 0.01 else 0.0
 
 
-@create_evaluator(name="bundle_discount_applied")
-def bundle_discount_applied(output: dict, expected: dict) -> float:
+def bundle_discount_applied(output, expected) -> float:
     """Did at least one item get the expected bundle discount?"""
     exp = expected.get("expected_bundle_discount")
     if exp is None:
-        return 1.0  # not checked
+        return 1.0
     items = output.get("items") or []
     return 1.0 if any(i.get("bundleDiscount", 0) >= exp - 0.01 for i in items) else 0.0
 
 
-@create_evaluator(name="replenish_flag_correct")
-def replenish_flag_correct(output: dict, expected: dict) -> float:
+def replenish_flag_correct(output, expected) -> float:
     """Is replenishInventory set correctly for the target product?"""
     pid = expected.get("expected_replenish_product")
     if pid is None:
-        return 1.0  # not checked
+        return 1.0
     exp_val = expected.get("expected_replenish_value")
     items = output.get("items") or []
     target = next((i for i in items if i.get("productId") == pid), None)
@@ -462,22 +457,33 @@ def replenish_flag_correct(output: dict, expected: dict) -> float:
     return 1.0 if target.get("replenishInventory") == exp_val else 0.0
 
 
-@create_evaluator(name="pet_advice_presence")
-def pet_advice_presence(output: dict, expected: dict) -> float:
+def pet_advice_presence(output, expected) -> float:
     """Is petAdvice present (or absent) as expected?"""
     exp = expected.get("expected_pet_advice_present")
     if exp is None:
-        return 1.0  # not checked
+        return 1.0
     advice = output.get("petAdvice", "")
     is_present = bool(advice and advice.strip())
     return 1.0 if is_present == exp else 0.0
 
 
-@create_evaluator(name="message_not_empty")
-def message_not_empty(output: dict, expected: dict) -> float:
+def message_not_empty(output, expected) -> float:
     """Does the response include a non-empty customer message?"""
     msg = output.get("message", "")
     return 1.0 if msg and len(msg.strip()) > 10 else 0.0
+
+
+EVALUATORS = [
+    status_match,
+    customer_type_match,
+    product_identified,
+    shipping_correct,
+    discount_correct,
+    bundle_discount_applied,
+    replenish_flag_correct,
+    pet_advice_presence,
+    message_not_empty,
+]
 
 
 # ─────────────────────────────────────────────────────────────
@@ -493,47 +499,40 @@ def main():
     if not PHOENIX_API_KEY:
         raise SystemExit("ERROR: Set PHOENIX_API_KEY environment variable.")
 
-    print(f"Connecting to Arize Phoenix at {PHOENIX_ENDPOINT}...")
-    client = px.Client(endpoint=PHOENIX_ENDPOINT, api_key=PHOENIX_API_KEY)
+    print(f"Connecting to Arize Phoenix ({PHOENIX_ENDPOINT})...")
+    client = Client(base_url=PHOENIX_ENDPOINT, api_key=PHOENIX_API_KEY)
 
-    # Upload (or reuse) the dataset
+    # Create or reuse the dataset
     print(f"Uploading dataset ({len(DATASET)} cases)...")
-    dataset = client.upload_dataset(
-        dataset_name="petstore-22-cases",
-        inputs=[{"prompt": row["prompt"], "id": row["id"], "category": row["category"]} for row in DATASET],
+    dataset = client.datasets.create_dataset(
+        name="petstore-22-cases",
+        description="22 end-to-end test cases for the Pet Store AgentCore Runtime",
+        inputs=[
+            {"prompt": row["prompt"], "id": row["id"], "category": row["category"]}
+            for row in DATASET
+        ],
         outputs=[
             {k: v for k, v in row.items() if k not in ("prompt", "id", "category")}
             for row in DATASET
         ],
+        input_keys=["prompt", "id", "category"],
+        output_keys=[k for k in DATASET[0] if k not in ("prompt", "id", "category")],
     )
 
-    # Timestamp-stamped experiment name so each run is traceable
-    from datetime import datetime, timezone
     ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
     experiment_name = f"petstore-eval-{ts}"
 
-    print(f"Running experiment '{experiment_name}'...")
-    experiment = run_experiment(
+    print(f"Running experiment '{experiment_name}' (this takes ~3 minutes)...")
+    experiment = client.experiments.run_experiment(
         dataset=dataset,
         task=task,
-        evaluators=[
-            status_match,
-            customer_type_match,
-            product_identified,
-            shipping_correct,
-            discount_correct,
-            bundle_discount_applied,
-            replenish_flag_correct,
-            pet_advice_presence,
-            message_not_empty,
-        ],
+        evaluators=EVALUATORS,
         experiment_name=experiment_name,
-        project_name=PROJECT_NAME,
-        concurrency=4,  # 4 parallel invocations — stay within AgentCore concurrency limits
+        experiment_description=f"Automated eval run {ts}",
     )
 
     print(f"\nExperiment complete: {experiment_name}")
-    print(f"View results at: {PHOENIX_ENDPOINT}/projects/{PROJECT_NAME}/experiments")
+    print(f"View results at: {PHOENIX_ENDPOINT}")
     return experiment
 
 
