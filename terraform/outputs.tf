@@ -53,6 +53,11 @@ output "s3_data_source_id" {
   value       = module.knowledge_bases.s3_data_source_id
 }
 
+output "ecr_image_uri" {
+  description = "Full URI of the latest agent image in ECR"
+  value       = module.agent_image.ecr_image_uri
+}
+
 output "inventory_function_name" {
   description = "Name of the inventory Lambda function (SYSTEM_FUNCTION_1_NAME)"
   value       = module.lambda_backends.inventory_function_name

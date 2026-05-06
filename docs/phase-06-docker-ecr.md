@@ -194,6 +194,32 @@ aws codebuild batch-get-builds --ids <build-id> \
 
 ---
 
+## Execution Log
+
+### First `terraform apply` — Two fixes needed
+
+**Fix 1: `zip` not available on EC2.** The local-exec provisioner used `zip` to package the source. The EC2 instance doesn't have it installed. Replaced with a Python `zip_source.py` script using the stdlib `zipfile` module.
+
+**Fix 2: `ecr-public:GetAuthorizationToken` denied.** The buildspec authenticated to ECR Public (`public.ecr.aws`) to pull the Python base image with higher rate limits. `HCL-User-Role-Aiml-BedrockAgentCore-CodeBuild` lacks this permission. ECR Public images support anonymous pulls — the login step was unnecessary and removed.
+
+### Second `terraform apply` — SUCCEEDED
+
+CodeBuild build completed in ~1 minute (fast because the base image was already cached in the ARM64 build environment).
+
+**Outputs:**
+```
+ecr_image_uri = "040504913362.dkr.ecr.us-east-1.amazonaws.com/petstore-agent-repo:latest"
+```
+
+**Image details:**
+```
+tag:    latest
+pushed: 2026-05-06T01:15:39Z
+size:   ~116 MB (115,837,542 bytes)
+```
+
+---
+
 ## For Srikar's Understanding
 
 ### Homework

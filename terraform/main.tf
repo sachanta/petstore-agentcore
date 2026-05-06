@@ -22,6 +22,16 @@ module "aoss" {
   collection_name          = "clashofagents"
 }
 
+module "agent_image" {
+  source = "./modules/agent_image"
+
+  project_name          = var.project_name
+  aws_region            = var.aws_region
+  aws_account_id        = data.aws_caller_identity.current.account_id
+  codebuild_role_arn    = module.foundation.codebuild_role_arn
+  codebuild_bucket_name = module.foundation.codebuild_bucket_name
+}
+
 module "lambda_backends" {
   source = "./modules/lambda_backends"
 
