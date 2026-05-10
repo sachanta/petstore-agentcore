@@ -28,7 +28,7 @@ from phoenix.client import Client
 # ─────────────────────────────────────────────────────────────
 
 PHOENIX_API_KEY  = os.environ.get("PHOENIX_API_KEY", "")
-PHOENIX_ENDPOINT = "https://app.phoenix.arize.com"
+PHOENIX_ENDPOINT = os.environ.get("PHOENIX_ENDPOINT", "http://localhost:6006")
 PROJECT_NAME     = "virtual-pet-store-agent"
 
 RUNTIME_ARN = os.environ.get("RUNTIME_ARN", "")
@@ -496,10 +496,7 @@ def main():
             "ERROR: Set RUNTIME_ARN.\n"
             "  export RUNTIME_ARN=$(cd terraform && terraform output -raw agent_runtime_arn)"
         )
-    if not PHOENIX_API_KEY:
-        raise SystemExit("ERROR: Set PHOENIX_API_KEY environment variable.")
-
-    print(f"Connecting to Arize Phoenix ({PHOENIX_ENDPOINT})...")
+    print(f"Connecting to Phoenix ({PHOENIX_ENDPOINT})...")
     client = Client(base_url=PHOENIX_ENDPOINT, api_key=PHOENIX_API_KEY)
 
     # Create or reuse the dataset
@@ -532,7 +529,7 @@ def main():
     )
 
     print(f"\nExperiment complete: {experiment_name}")
-    print(f"View results at: {PHOENIX_ENDPOINT}")
+    print(f"View results at: {PHOENIX_ENDPOINT} (open in browser)")
     return experiment
 
 

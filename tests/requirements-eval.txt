@@ -1,2 +1,2 @@
-arize-phoenix>=4.0.0
+arize-phoenix[server]>=4.0.0
 boto3
