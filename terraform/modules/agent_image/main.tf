@@ -131,6 +131,7 @@ resource "null_resource" "trigger_image_build" {
       filesha256("${path.root}/../pet_store_agent/inventory_management.py"),
       filesha256("${path.root}/../pet_store_agent/user_management.py"),
       filesha256("${path.root}/../pet_store_agent/requirements.txt"),
+      filesha256("${path.root}/../pet_store_agent/tracing.py"),
       filesha256("${path.root}/../Dockerfile"),
     ]))
   }

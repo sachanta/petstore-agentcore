@@ -47,3 +47,29 @@ variable "guardrail_version" {
   description = "Bedrock Guardrail published version (GUARDRAIL_VERSION env var)"
   type        = string
 }
+
+variable "arize_space_id" {
+  description = "Arize AX Space ID (ARIZE_SPACE_ID env var)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "arize_api_key" {
+  description = "Arize AX API key (ARIZE_API_KEY env var)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "arize_project_name" {
+  description = "Arize project name for grouping traces (ARIZE_PROJECT_NAME env var)"
+  type        = string
+  default     = "virtual-pet-store-agent"
+}
+
+variable "agent_code_hash" {
+  description = "Hash of agent source files — triggers runtime redeploy when image changes"
+  type        = string
+  default     = ""
+}

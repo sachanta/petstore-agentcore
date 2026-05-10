@@ -9,3 +9,23 @@ variable "project_name" {
   type        = string
   default     = "petstore"
 }
+
+variable "arize_space_id" {
+  description = "Arize AX Space ID. Pass via TF_VAR_arize_space_id env var — do not hardcode."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "arize_api_key" {
+  description = "Arize AX API key. Pass via TF_VAR_arize_api_key env var — do not hardcode."
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "arize_project_name" {
+  description = "Arize project name for grouping traces in the UI"
+  type        = string
+  default     = "virtual-pet-store-agent"
+}

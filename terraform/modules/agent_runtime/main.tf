@@ -48,6 +48,10 @@ resource "null_resource" "agent_runtime" {
     guardrail_id        = var.guardrail_id
     guardrail_version   = var.guardrail_version
     region              = var.aws_region
+    arize_space_id      = var.arize_space_id
+    arize_project       = var.arize_project_name
+    arize_api_key_hash  = sha256(var.arize_api_key)
+    agent_code_hash     = var.agent_code_hash
   }
 
   provisioner "local-exec" {
@@ -65,7 +69,10 @@ resource "null_resource" "agent_runtime" {
           SYSTEM_FUNCTION_1_NAME=${var.inventory_function_name} \
           SYSTEM_FUNCTION_2_NAME=${var.user_management_function_name} \
           GUARDRAIL_ID=${var.guardrail_id} \
-          GUARDRAIL_VERSION=${var.guardrail_version}
+          GUARDRAIL_VERSION=${var.guardrail_version} \
+          ARIZE_SPACE_ID=${var.arize_space_id} \
+          ARIZE_API_KEY=${var.arize_api_key} \
+          ARIZE_PROJECT_NAME=${var.arize_project_name}
     EOT
   }
 

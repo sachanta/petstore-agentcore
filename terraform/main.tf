@@ -52,6 +52,10 @@ module "agent_runtime" {
   user_management_function_name = module.lambda_backends.user_management_function_name
   guardrail_id                  = module.guardrail.guardrail_id
   guardrail_version             = module.guardrail.guardrail_version
+  arize_space_id                = var.arize_space_id
+  arize_api_key                 = var.arize_api_key
+  arize_project_name            = var.arize_project_name
+  agent_code_hash               = module.agent_image.agent_code_hash
 }
 
 module "guardrail" {

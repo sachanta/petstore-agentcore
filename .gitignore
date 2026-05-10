@@ -25,3 +25,7 @@ __pycache__/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Secrets — never commit API keys
+tracing/
+terraform/.env

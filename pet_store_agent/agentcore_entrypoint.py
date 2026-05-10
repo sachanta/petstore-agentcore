@@ -7,10 +7,17 @@ import os
 
 import boto3
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
+from opentelemetry import context as otel_context
 import pet_store_agent
+from tracing import setup_tracing
 
 logger = logging.getLogger(__name__)
 app = BedrockAgentCoreApp()
+
+# Initialise Arize Phoenix tracing once at container startup.
+# Set PHOENIX_ENDPOINT + PHOENIX_API_KEY env vars to send traces to Arize cloud;
+# leave unset to send to a local Phoenix server at http://localhost:6006.
+setup_tracing()
 
 
 def _check_guardrail(prompt: str) -> str | None:
@@ -161,7 +168,13 @@ def handler(payload):
     if blocked:
         return blocked
 
-    response = pet_store_agent.process_request(prompt)
+    # Detach AgentCore's trace context so our LangChain spans become root spans
+    # in Arize instead of orphaned children whose parent only exists in X-Ray.
+    token = otel_context.attach(otel_context.Context())
+    try:
+        response = pet_store_agent.process_request(prompt)
+    finally:
+        otel_context.detach(token)
     return _apply_business_rules(response)
 
 

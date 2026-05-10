@@ -3,3 +3,6 @@ langchain
 langgraph
 langchain-aws
 langchain-anthropic
+openinference-instrumentation-langchain
+arize-otel
+opentelemetry-exporter-otlp-proto-http
