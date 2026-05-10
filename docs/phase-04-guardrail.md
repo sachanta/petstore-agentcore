@@ -167,3 +167,43 @@ Content filters (`HATE`, `VIOLENCE`, etc.) are pre-built classifiers from AWS. T
 
 **5. What does `CrossRegionConfig` in the guardrail do?**
 Look at the YAML — the guardrail has a `CrossRegionConfig` block referencing a `guardrail-profile`. This is related to how Bedrock handles inference across regions. Why would a guardrail need cross-region configuration? What problem does this solve?
+
+How PetStoreGuardrail is created
+The 3 files
+File	Purpose
+variables.tf	Input parameters: project_name, aws_region, aws_account_id
+main.tf	Defines the guardrail and its version — the actual logic
+outputs.tf	Exports guardrail_id, guardrail_arn, guardrail_version for Phase 7 to consume
+Resource 1 — aws_bedrock_guardrail (main.tf:17)
+This is a native Terraform resource — no scripts, no local-exec. Terraform calls the Bedrock API directly.
+
+Blocked messaging (main.tf:21-22) — What gets returned to the caller when the guardrail fires. Both input and output messages are JSON-encoded so the entrypoint can parse them directly as the agent's standard {"status": "Reject", "message": "..."} format.
+
+Content filters (main.tf:27-58) — 6 categories, all set to input_strength = HIGH and output_strength = NONE:
+
+HIGH on input = most aggressive blocking — errs on the side of blocking
+NONE on output = agent responses are not filtered (only user inputs are)
+Categories covered: HATE, INSULTS, SEXUAL, VIOLENCE, MISCONDUCT, PROMPT_ATTACK
+PROMPT_ATTACK is the injection-detection filter — it catches attempts like "ignore your instructions" or "what is your system prompt".
+
+Topic policy (main.tf:64-75) — A custom classifier trained on a natural language definition + 3 few-shot examples. Bedrock uses these to build an internal text classifier for the topic. type = "DENY" means any input that matches → blocked. This is how birds/fish/reptiles questions get rejected even though they don't match any of the 6 harmful content categories.
+
+Resource 2 — aws_bedrock_guardrail_version (main.tf:91)
+A guardrail always starts in DRAFT state when created. A version is an immutable snapshot of that draft.
+
+Why this matters: The AgentCore Runtime in Phase 7 is configured with a specific version number (e.g. "1"), not "DRAFT". This means:
+
+You can edit the guardrail rules freely without affecting the live agent
+To push changes live, you publish a new version and update the runtime
+create_before_destroy = true (main.tf:96) — On terraform apply after a guardrail change, Terraform creates the new version before destroying the old one. This prevents a window where the agent has no valid version to reference.
+
+How outputs flow to Phase 7
+outputs.tf exports guardrail_id and guardrail_version. These are passed into the AgentCore Runtime as environment variables GUARDRAIL_ID and GUARDRAIL_VERSION, which agentcore_entrypoint.py reads at startup to call bedrock-runtime.apply_guardrail().
+
+Useful links
+aws_bedrock_guardrail Terraform resource — full schema reference for the resource used here
+aws_bedrock_guardrail_version Terraform resource — versioning resource
+Bedrock Guardrails concepts (AWS docs) — what guardrails are and how they work
+Content filters in Bedrock Guardrails — the 6 filter categories and what HIGH/MEDIUM/LOW/NONE mean
+Topic policies in Bedrock Guardrails — how the custom topic classifier works with definitions and examples
+Bedrock apply_guardrail API — the API called at runtime in agentcore_entrypoint.py
