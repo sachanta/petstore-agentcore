@@ -214,7 +214,7 @@ print('Feed meta-prompt.txt to your LLM of choice to generate the optimized prom
 
 You can feed `meta-prompt.txt` to Claude, GPT-4, or any capable model. Or let Claude Code handle it directly using the `arize-prompt-optimization` skill.
 
-The `phoenix` MCP server also provides prompt management tools --- you can version and store optimized prompts directly in Arize Phoenix for tracking iterations alongside experiment results.
+The `arize-live-traces` MCP server can also be used to inspect LLM spans directly from Claude Code, which is helpful for extracting system prompts without a full export.
 
 ---
 

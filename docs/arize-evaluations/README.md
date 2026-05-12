@@ -86,10 +86,8 @@ If no traces appear, see [arize_traces.md](../arize_traces.md) for setup.
 Claude Code should have the Arize MCP servers configured (see [arize_mcp.md](../arize_mcp.md)):
 ```bash
 claude mcp list
-# Should show: arize-tracing-assistant, arize-ax-docs, phoenix
+# Should show: arize-tracing-assistant, arize-ax-docs, arize-live-traces
 ```
-
-The `phoenix` server (`@arizeai/phoenix-mcp`) provides direct access to traces, spans, datasets, experiments, prompts, and annotations from within Claude Code. It uses the same API key as Arize (`ARIZE_API_KEY` / `PHOENIX_API_KEY` are interchangeable for Arize-hosted Phoenix).
 
 ## Architecture
 

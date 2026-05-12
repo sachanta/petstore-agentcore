@@ -174,7 +174,7 @@ An experiment calls the actual agent for every example in the dataset and record
 
 ### Export the dataset
 
-The `phoenix` MCP server can also list and manage datasets directly. For scripted workflows, use the `ax` CLI:
+The `arize-live-traces` MCP server can also be used for ad-hoc trace exploration. For scripted workflows, use the `ax` CLI:
 
 ```bash
 ax datasets export petstore-golden-v1 \

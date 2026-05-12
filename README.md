@@ -131,23 +131,24 @@ The tracing setup required solving three AgentCore interference issues. Each is 
 
 ## MCP Servers (Claude Code)
 
-Three MCP servers are configured for use with Claude Code, giving Claude direct access to Arize docs, instrumentation help, and live trace/experiment data.
+Three MCP servers are configured for use with Claude Code, giving Claude direct access to Arize docs and live trace data.
 
 | Server | Purpose | How to add |
 |--------|---------|------------|
 | `arize-tracing-assistant` | Instrumentation help, span debugging | `claude mcp add arize-tracing-assistant uvx arize-tracing-assistant@latest` |
 | `arize-ax-docs` | Full Arize documentation search | `claude mcp add arize-ax-docs --transport http https://arize.com/docs/mcp` |
-| `phoenix` | Traces, spans, datasets, experiments, prompts, annotations | See below |
+| `arize-live-traces` | Live trace queries via Arize GraphQL API | See below |
 
-### Phoenix MCP (official)
+### Custom MCP server: arize-live-traces
 
 ```bash
-claude mcp add phoenix -- npx -y @arizeai/phoenix-mcp@latest \
-  --baseUrl https://app.phoenix.arize.com \
-  --apiKey <your-arize-api-key>
+claude mcp add arize-live-traces \
+  python3 mcp/arize/server.py \
+  -e ARIZE_API_KEY=<your-key> \
+  -e ARIZE_SPACE_ID=<your-space-id>
 ```
 
-This replaces the earlier custom `arize-live-traces` server (source archived at [mcp/arize/server.py](mcp/arize/server.py)).
+Tools: `list_models`, `get_recent_traces`, `get_trace`, `get_stats`, `search_spans`.
 
 See [docs/arize_mcp.md](docs/arize_mcp.md) for full setup and auth details.
 
@@ -200,8 +201,8 @@ tests/
   test_agent.py             22 end-to-end tests against live runtime
   eval_arize.py             Arize Phoenix evaluation suite
 
-mcp/arize/                Archived custom MCP server (replaced by @arizeai/phoenix-mcp)
-  server.py                 GraphQL client with 5 tools (reference only)
+mcp/arize/                Custom MCP server for live trace access
+  server.py                 GraphQL client with 5 tools
   requirements.txt          mcp[cli] + httpx
 
 docs/                     Build guides, architecture, troubleshooting

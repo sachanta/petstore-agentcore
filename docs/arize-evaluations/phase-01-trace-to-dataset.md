@@ -79,9 +79,9 @@ ax spans export virtual-pet-store-agent \
   --output-dir .arize-tmp-traces
 ```
 
-### Alternative: Use the Phoenix MCP server
+### Alternative: Use the arize-live-traces MCP server
 
-If you have the `phoenix` MCP server configured, Claude Code can query traces directly without exporting files:
+If you have the `arize-live-traces` MCP server configured, Claude Code can query traces directly without exporting files:
 
 - `get_recent_traces` --- browse recent traces interactively
 - `get_trace` --- inspect all spans for a specific trace ID
