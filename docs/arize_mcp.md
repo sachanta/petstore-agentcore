@@ -1,12 +1,12 @@
 # Arize MCP Servers — Setup Guide
 
-Arize provides two official MCP (Model Context Protocol) servers for Claude Code. Once configured, Claude can query Arize documentation and get instrumentation help directly without you having to relay questions back and forth.
+Three MCP (Model Context Protocol) servers give Claude Code direct access to Arize documentation, instrumentation help, and live trace/experiment data.
 
 | Server | Purpose |
 |---|---|
 | `arize-tracing-assistant` | Live instrumentation help, span debugging, best practices, code examples |
 | `arize-ax-docs` | Full-text search across all Arize AX documentation and API references |
-| `arize-live-traces` | **Custom** — live read access to actual trace data via Arize GraphQL API |
+| `phoenix` | Official Arize Phoenix MCP — traces, spans, datasets, experiments, prompts, annotations |
 
 ---
 
@@ -53,6 +53,16 @@ claude mcp add arize-ax-docs --transport http https://arize.com/docs/mcp
 
 Both commands write to `.claude.json` in your project root (or `~/.claude.json` if using global scope). This file is project-scoped by default, meaning the servers are only active when working in this project.
 
+### Phoenix MCP (official — replaces the custom arize-live-traces server)
+
+```bash
+claude mcp add phoenix -- npx -y @arizeai/phoenix-mcp@latest \
+  --baseUrl https://app.phoenix.arize.com \
+  --apiKey <your-arize-api-key>
+```
+
+The Phoenix API key is the same as your Arize API key (`ak-...`). This server provides tools for traces, spans, datasets, experiments, prompts, and annotations — a superset of the custom `arize-live-traces` server it replaces.
+
 ---
 
 ## Verifying the Setup
@@ -65,11 +75,13 @@ Expected output:
 ```
 arize-tracing-assistant: uvx arize-tracing-assistant@latest - ✓ Connected
 arize-ax-docs: https://arize.com/docs/mcp (HTTP) - ✓ Connected
+phoenix: npx -y @arizeai/phoenix-mcp@latest ... - ✓ Connected
 ```
 
 If a server shows `✗ Failed` instead of `✓ Connected`:
 - For `arize-tracing-assistant`: check that `uvx` is on your PATH (`which uvx`)
 - For `arize-ax-docs`: check outbound HTTPS access to `arize.com`
+- For `phoenix`: check that `npx` is available and your API key is valid
 
 ---
 
@@ -105,39 +117,11 @@ During the AgentCore tracing setup (documented in [arize_traces.md](arize_traces
 
 ---
 
-## Custom MCP Server — `arize-live-traces`
+## Archived: Custom MCP Server — `arize-live-traces`
 
-This is a custom MCP server built specifically for this project. It connects directly to the Arize GraphQL API (`https://app.arize.com/graphql`) using `x-api-key` authentication and exposes four tools:
+> **Deprecated (2026-05)**: This custom server has been replaced by the official `@arizeai/phoenix-mcp` server (the `phoenix` entry above), which provides broader functionality. The source is kept at [mcp/arize/server.py](../mcp/arize/server.py) as a reference for the Arize GraphQL API auth discovery (`x-api-key` header).
 
-| Tool | What it does |
-|---|---|
-| `list_models` | Lists all models/projects in the Arize space |
-| `get_recent_traces` | Returns recent traces with latency, tokens, cost grouped by trace ID |
-| `get_trace` | Returns all spans for a specific trace ID in tree order |
-| `get_stats` | Returns aggregate stats: p50/p99 latency, total tokens, total cost, error count |
-| `search_spans` | Filters spans by name, kind (LLM/CHAIN/TOOL/AGENT), or status (OK/ERROR) |
-
-### Source
-
-[mcp/arize/server.py](../mcp/arize/server.py) — built with `mcp[cli]` + `httpx`.
-
-### Auth discovery
-
-During setup, several auth header formats were tried against `https://app.arize.com/graphql`:
-- `Authorization: Bearer <key>` → 401 Unauthorized
-- `space_id` + `api_key` headers → 401 Unauthorized
-- `x-api-key: <key>` → ✓ 200 OK
-
-The GraphQL schema was introspected live to discover the correct query structure (`node` → `Space` → `models` → `spanRecordsPublic` with `ModelDatasetInput`). The environment name for OTLP traces is `tracing` (not `production`).
-
-### Adding the custom server
-
-```bash
-claude mcp add arize-live-traces \
-  python3 /path/to/petstore-agentcore/mcp/arize/server.py \
-  -e ARIZE_API_KEY=<your-key> \
-  -e ARIZE_SPACE_ID=<your-space-id>
-```
+The custom server connected to `https://app.arize.com/graphql` and exposed 5 tools: `list_models`, `get_recent_traces`, `get_trace`, `get_stats`, `search_spans`. Auth discovery found that the only working header format was `x-api-key: <key>` (not `Authorization: Bearer`). The GraphQL schema used `node` → `Space` → `models` → `spanRecordsPublic` with `ModelDatasetInput`, and the environment name for OTLP traces was `tracing` (not `production`).
 
 ---
 
