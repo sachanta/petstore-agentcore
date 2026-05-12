@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+# ──────────────────────────────────────────────────────────────
+# DEPRECATED (2026-05): This custom MCP server has been replaced
+# by the official @arizeai/phoenix-mcp server, which provides
+# broader functionality (traces, datasets, experiments, prompts,
+# annotations).
+#
+# Install the replacement:
+#   claude mcp add phoenix -- npx -y @arizeai/phoenix-mcp@latest \
+#     --baseUrl https://app.phoenix.arize.com --apiKey <key>
+#
+# This file is kept as an archived reference for the Arize
+# GraphQL API auth discovery (x-api-key header) documented in
+# docs/arize_mcp.md and the blog post at
+# docs/simplex-stepping-in-an-agentic-world.md.
+# ──────────────────────────────────────────────────────────────
 """
 Arize AX MCP Server — live trace data access via GraphQL API.
 
