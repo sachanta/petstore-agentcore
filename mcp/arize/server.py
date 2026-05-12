@@ -121,8 +121,8 @@ def get_recent_traces(hours_back: int = 24, limit: int = 20) -> str:
                      node {
                        traceId spanId parentId name spanKind
                        statusCode startTime endTime latencyMs
-                       traceTokenCounts { total prompt completion }
-                       totalCost
+                       traceTokenCounts { aggregateTotalTokenCount aggregatePromptTokenCount aggregateCompletionTokenCount }
+                       totalCost { aggregateTotalCost }
                      }
                    }
                  }
@@ -155,8 +155,8 @@ def get_recent_traces(hours_back: int = 24, limit: int = 20) -> str:
             f"\n  status    : {root['statusCode']}"
             f"\n  started   : {root['startTime']}"
             f"\n  latency   : {root['latencyMs']:.0f}ms"
-            f"\n  tokens    : prompt={tokens.get('prompt',0)} completion={tokens.get('completion',0)} total={tokens.get('total',0)}"
-            f"\n  cost      : ${root.get('totalCost') or 0:.4f}"
+            f"\n  tokens    : prompt={tokens.get('aggregatePromptTokenCount',0)} completion={tokens.get('aggregateCompletionTokenCount',0)} total={tokens.get('aggregateTotalTokenCount',0)}"
+            f"\n  cost      : ${(root.get('totalCost') or {}).get('aggregateTotalCost') or 0:.4f}"
             f"\n  spans     : {len(spans)}"
         )
     return "\n\n".join(lines)
@@ -191,7 +191,7 @@ def get_trace(trace_id: str, hours_back: int = 48) -> str:
         {
             "modelId": model_id,
             "dataset": _dataset_args(hours_back),
-            "first": 200,
+            "first": 50,
         },
     )
     all_spans = [e["node"] for e in data["node"]["spanRecordsPublic"]["edges"]]
@@ -232,27 +232,38 @@ def get_stats(hours_back: int = 24) -> str:
         hours_back: Time window in hours (default 24)
     """
     model_id = _model_id()
-    data = gql(
+    ds = _dataset_args(hours_back)
+
+    # Query stats and spans separately to stay under complexity limit
+    stats_data = gql(
+        """query($modelId: ID!, $dataset: ModelDatasetInput!, $timeZone: String!) {
+             node(id: $modelId) {
+               ... on Model {
+                 llmTracingStats(dataset: $dataset, timeZone: $timeZone) {
+                   latencyMsP50 latencyMsP99 tokenCountTotal costTotal
+                 }
+               }
+             }
+           }""",
+        {"modelId": model_id, "dataset": ds, "timeZone": "UTC"},
+    )
+    span_data = gql(
         """query($modelId: ID!, $dataset: ModelDatasetInput!) {
              node(id: $modelId) {
                ... on Model {
-                 llmTracingStats(dataset: $dataset) {
-                   latencyMsP50 latencyMsP99 tokenCountTotal costTotal
-                 }
-                 spanRecordsPublic(first: 500, dataset: $dataset) {
+                 spanRecordsPublic(first: 50, dataset: $dataset) {
                    edges { node { traceId statusCode spanKind } }
                  }
                }
              }
            }""",
-        {"modelId": model_id, "dataset": _dataset_args(hours_back)},
+        {"modelId": model_id, "dataset": ds},
     )
-    model = data["node"]
-    stats = model.get("llmTracingStats") or {}
-    spans = [e["node"] for e in model["spanRecordsPublic"]["edges"]]
+
+    stats = stats_data["node"].get("llmTracingStats") or {}
+    spans = [e["node"] for e in span_data["node"]["spanRecordsPublic"]["edges"]]
 
     trace_ids = set(s["traceId"] for s in spans)
-    root_spans = [s for s in spans if s["spanKind"] in ("CHAIN", "AGENT", "")]
     errors = [s for s in spans if s["statusCode"] == "ERROR"]
 
     return (
@@ -283,7 +294,7 @@ def search_spans(name: str = "", kind: str = "", status: str = "", hours_back: i
         """query($modelId: ID!, $dataset: ModelDatasetInput!) {
              node(id: $modelId) {
                ... on Model {
-                 spanRecordsPublic(first: 500, dataset: $dataset) {
+                 spanRecordsPublic(first: 50, dataset: $dataset) {
                    edges {
                      node {
                        traceId spanId name spanKind statusCode startTime latencyMs
