@@ -1,0 +1,114 @@
+[
+  {
+    "example_id": "0ee6bdc8-0e5f-4416-87d9-450ee240c0ad",
+    "output": "{\"status\": \"Accept\", \"message\": \"Hi John, Thank you for your interest! You'll receive our 10% multi-unit discount as a valued subscriber for your two Bark Park Buddy bottles.\", \"customerType\": \"Subscribed\", \"items\": [{\"productId\": \"BP010\", \"price\": 16.99, \"quantity\": 2, \"bundleDiscount\": 0.1, \"total\": 32.28, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"While these bottles are perfect for keeping your Chihuahua hydrated during walks with their convenient fold-out bowls, we recommend using a proper pet bath or sink with appropriate dog shampoo for bathing. The bottles are specifically designed for drinking purposes only.\", \"subtotal\": 32.28, \"additionalDiscount\": 0, \"total\": 47.23}"
+  },
+  {
+    "example_id": "10bec5ff-6395-49b6-80d0-23390972c988",
+    "output": "{\"raw\": \"\\\"\\\"\", \"parse_error\": true}"
+  },
+  {
+    "example_id": "16b475d6-bdfc-48e1-9f30-7c262047427e",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! We offer our 30lb bag of Doggy Delights for just $54.99. This premium grain-free dry dog food features real meat as the first ingredient, ensuring quality nutrition for your furry friend.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"DD006\", \"price\": 54.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 54.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 54.99, \"additionalDiscount\": 0, \"total\": 69.94}"
+  },
+  {
+    "example_id": "173fa70a-3537-40b0-9453-e819dc532813",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! Thank you for your order. You've selected 3 Chicken Crunch Dog Treats at $12.99 each. The second and third treats will receive a 10% bundle discount. The total cost before shipping is $36.37.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"TS001\", \"price\": 12.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 12.99, \"replenishInventory\": false}, {\"productId\": \"TS001\", \"price\": 12.99, \"quantity\": 1, \"bundleDiscount\": 0.1, \"total\": 11.69, \"replenishInventory\": false}, {\"productId\": \"TS001\", \"price\": 12.99, \"quantity\": 1, \"bundleDiscount\": 0.1, \"total\": 11.69, \"replenishInventory\": false}], \"shippingCost\": 19.95, \"petAdvice\": \"\", \"subtotal\": 36.37, \"additionalDiscount\": 0, \"total\": 56.32}"
+  },
+  {
+    "example_id": "190f8cd3-801c-4c63-9ff6-4506a303d506",
+    "output": "{\"status\": \"Accept\", \"message\": \"Hi Bob, thanks for reaching out! To prevent your cat from scratching furniture, consider providing a scratching post or cat tree where they can direct their scratching behavior. Also, ensure you keep playthings away from your fingers or eyes to avoid potential infections from their claws and mouths.\", \"customerType\": \"Subscribed\", \"items\": [], \"shippingCost\": 0, \"petAdvice\": \"To prevent your cat from scratching furniture, consider providing a scratching post or cat tree where they can direct their scratching behavior. Also, ensure you keep playthings away from your fingers or eyes to avoid potential infections from their claws and mouths.\", \"subtotal\": 0, \"additionalDiscount\": 0, \"total\": 0}"
+  },
+  {
+    "example_id": "1de61c33-4d16-489b-a617-2e8a7b60cbb7",
+    "output": "{\"status\": \"Accept\", \"message\": \"Why did the scarecrow win an award? Because he was outstanding in his field! Remember, we're here to help with all your pet needs too. What can we assist you with today?\", \"customerType\": \"Guest\", \"items\": [], \"shippingCost\": 0, \"petAdvice\": \"\", \"subtotal\": 0, \"additionalDiscount\": 0, \"total\": 0}"
+  },
+  {
+    "example_id": "29fa74c0-f834-4ea1-abb2-766ea7767a0f",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! Thank you for your interest in our products. We are pleased to inform you that both the CleanPaws Self-Cleaning Litter Box and the SmartFeed Automatic Dog Feeder are available for purchase. Please note that the SmartFeed Automatic Dog Feeder is currently running low in stock, so we recommend placing your order soon.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CA003\", \"price\": 199.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 199.99, \"replenishInventory\": false}, {\"productId\": \"BP015\", \"price\": 129.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 129.99, \"replenishInventory\": true}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 329.98, \"additionalDiscount\": 0.15, \"total\": 280.48}"
+  },
+  {
+    "example_id": "30673541-e223-4620-8e3e-484e9eb7bc67",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! We have the Chicken Crunch Dog Treats available for $12.99 per 8 oz bag. This high-protein, single-ingredient treat is perfect for dogs with food allergies or sensitivities. Your total, including shipping, will be $27.94.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"TS001\", \"price\": 12.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 12.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 12.99, \"additionalDiscount\": 0, \"total\": 27.94}"
+  },
+  {
+    "example_id": "3095db16-d4e3-4de3-abb0-4794ea5f1687",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer, the Bark Park Buddy is a portable water bottle designed for dogs on the go. It features a fold-out drinking bowl integrated into the lid, allowing your dog to drink directly from the bottle during walks, hikes, or trips to the park. This product is designed exclusively for hydration purposes and is not suitable for bathing.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"BP010\", \"price\": 16.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 16.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 16.99, \"additionalDiscount\": 0, \"total\": 31.94}"
+  },
+  {
+    "example_id": "47caab0e-b115-4418-a50b-6b7ad7989d98",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer, we have the OrthoRest Dog Bed available for $89.99. This bed features a 4-inch memory foam base that conforms to your dog's body shape, relieving pressure on joints. Please note, this item is currently in low stock.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"BP012\", \"price\": 89.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 89.99, \"replenishInventory\": true}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 89.99, \"additionalDiscount\": 0, \"total\": 89.99}"
+  },
+  {
+    "example_id": "4f15ea46-ed45-4e29-94c1-6998270e426d",
+    "output": "{\"status\": \"Reject\", \"message\": \"Sorry! We can't accept your request. What else do you need?\"}"
+  },
+  {
+    "example_id": "5f8c4a78-1d89-41be-b06b-f0ac922b830b",
+    "output": "{\"status\": \"Reject\", \"message\": \"We are sorry, but currently we do not have hamster wheels available in our catalog. Please check back later or consider other products for your pet's exercise needs.\", \"customerType\": \"Guest\", \"items\": [], \"shippingCost\": 0, \"petAdvice\": \"\", \"subtotal\": 0, \"additionalDiscount\": 0, \"total\": 0}"
+  },
+  {
+    "example_id": "633a7fac-421a-40fe-98aa-17f22b9a43f1",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Jane, thank you for your interest! Meow Munchies is a premium dry cat food formulated with real chicken as the first ingredient. It is designed to meet the nutritional needs of adult indoor cats, supporting healthy weight, digestion, and a shiny coat. The 20 lb bag is priced at $42.99.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CM001\", \"price\": 42.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 42.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 42.99, \"additionalDiscount\": 0, \"total\": 57.94}"
+  },
+  {
+    "example_id": "6b9582cd-c753-4969-b191-cda31eeca2c7",
+    "output": "{\"status\": \"Accept\", \"message\": \"Hi John, thank you for your interest! The Bark Park Buddy is designed exclusively for hydration purposes and is not suitable for bathing. It is currently in stock and priced at $16.99.\", \"customerType\": \"Subscribed\", \"items\": [{\"productId\": \"BP010\", \"price\": 16.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 16.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"While the Bark Park Buddy is perfect for keeping your dog hydrated during walks with its convenient fold-out bowl, we recommend using a proper pet bath or sink with appropriate dog shampoo for bathing. The bottle is specifically designed for drinking purposes only.\", \"subtotal\": 16.99, \"additionalDiscount\": 0, \"total\": 31.94}"
+  },
+  {
+    "example_id": "6d38d7fe-3487-4559-9f68-b19fc375f9e3",
+    "output": "{\"status\": \"Accept\", \"message\": \"Hi Jane, thank you for your order! We have 5 bags of Meow Munchies available for you. The total cost is $214.95 before any discounts. Since your subscription has expired, you won't receive the bundle discount. However, the total qualifies for a 15% discount, bringing the final total to $182.71. Please note that there is a flat rate shipping cost of $14.95 as your order subtotal is under $75.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CM001\", \"price\": 42.99, \"quantity\": 5, \"bundleDiscount\": 0.1, \"total\": 197.75, \"replenishInventory\": false}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 197.75, \"additionalDiscount\": 0, \"total\": 197.75}"
+  },
+  {
+    "example_id": "7845089a-14a7-49cc-bdfc-a3bb47cfedc9",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer, we have a variety of cat food options available. Here are some of our top picks: Meow Munchies Dry Cat Food, Kitten Kickstart Dry Cat Food, Purrfect Pate Wet Cat Food, Senior Whiskers Formula Dry Cat Food, and Indoor Calm Blend Dry Cat Food. Please let us know if you need more information on any specific product.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CM001\", \"price\": 42.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 42.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 42.99, \"additionalDiscount\": 0, \"total\": 57.94}"
+  },
+  {
+    "example_id": "7d658fd3-8fdf-46fe-a906-765db9946ef3",
+    "output": "{\"status\": \"Accept\", \"message\": \"Hi John, Thank you for your interest! We have 10 units of Doggy Delights available for you. As a subscribed customer, you'll receive our 10% multi-unit discount on each additional unit beyond the first.\", \"customerType\": \"Subscribed\", \"items\": [{\"productId\": \"DD006\", \"price\": 54.99, \"quantity\": 10, \"bundleDiscount\": 0.1, \"total\": 500.41, \"replenishInventory\": false}], \"shippingCost\": 0.0, \"petAdvice\": \"Doggy Delights is a premium grain-free dry dog food crafted for adult dogs of all breeds. Real meat is the first ingredient, ensuring high-quality protein in every bite. Free from artificial preservatives, colors, and fillers.\", \"subtotal\": 500.41, \"additionalDiscount\": 0.15, \"total\": 425.35}"
+  },
+  {
+    "example_id": "804dc591-c5bb-44a5-91e1-b47cd95c8f7c",
+    "output": "{\"status\": \"Reject\", \"message\": \"Sorry! We can't accept your request. What else do you need?\"}"
+  },
+  {
+    "example_id": "81620a8d-bf6e-4797-a11d-87a47796e5a2",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! We offer the OrthoRest Dog Bed for $89.99. This bed features a 4-inch memory foam base that conforms to your dog's body shape, relieving pressure on joints. The removable, machine-washable cover is made from soft faux fur on top and a non-slip waterproof base underneath. Ideal for large breeds and senior dogs.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"BP012\", \"price\": 89.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 89.99, \"replenishInventory\": true}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 89.99, \"additionalDiscount\": 0, \"total\": 89.99}"
+  },
+  {
+    "example_id": "9e95247c-18e0-4dcf-a422-c1135a34d082",
+    "output": "{\"status\": \"Accept\", \"message\": \"Hi John! Based on your preferences, we recommend our Doggy Delights dry dog food. It's a premium grain-free formula with real meat as the first ingredient, ensuring high-quality protein. Free from artificial preservatives, colors, and fillers, it's perfect for adult dogs of all breeds.\", \"customerType\": \"Subscribed\", \"items\": [{\"productId\": \"DD006\", \"price\": 54.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 54.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"When selecting dog food, it's important to consider the energy content, protein levels, and essential nutrients like glucosamine, chondroitin, and omega fatty acids. These ingredients support joint health, cognitive function, and overall well-being. Always choose a reputable brand with high-quality ingredients for the best nutrition.\", \"subtotal\": 54.99, \"additionalDiscount\": 0, \"total\": 69.94}"
+  },
+  {
+    "example_id": "a06c88ee-1849-496e-8959-aec574e35e22",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! The SmartFeed Automatic Dog Feeder is available at $129.99. This product is currently in low stock, so we recommend placing your order soon. The feeder is designed to dispense pre-programmed meals up to 6 times per day, with a companion app for remote control. It also features a built-in camera for monitoring your pet.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"BP015\", \"price\": 129.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 129.99, \"replenishInventory\": true}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 129.99, \"additionalDiscount\": 0, \"total\": 129.99}"
+  },
+  {
+    "example_id": "a264a6ce-fc35-4306-b8d8-05ef85336d61",
+    "output": "{\"status\": \"Reject\", \"message\": \"Sorry! We can't accept your request. What else do you need?\"}"
+  },
+  {
+    "example_id": "a2a406c8-d23e-40cd-837c-b224ac1c2c29",
+    "output": "{\"status\": \"Reject\", \"message\": \"Sorry! We can't accept your request. What else do you need?\"}"
+  },
+  {
+    "example_id": "ab450d7b-dc37-4e51-9b92-62cf2c739397",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer, we have Doggy Delights available for $54.99 per 30 lb bag. This premium grain-free dry dog food features real meat as the first ingredient, ensuring quality nutrition for your furry friend.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"DD006\", \"price\": 54.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 54.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 54.99, \"additionalDiscount\": 0, \"total\": 69.94}"
+  },
+  {
+    "example_id": "b5a1b3ad-b842-4fbd-8a09-471aa359e097",
+    "output": "{\"status\": \"Reject\", \"message\": \"We are sorry, but we do not have unicorn toys in our catalog at the moment. Please check back later or consider other exciting toys we offer for your pet.\", \"customerType\": \"Guest\", \"items\": [], \"shippingCost\": 0, \"petAdvice\": \"\", \"subtotal\": 0, \"additionalDiscount\": 0, \"total\": 0}"
+  },
+  {
+    "example_id": "c974f48c-5edf-4cb4-834f-e25d08506ac5",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! Thank you for your order. We have added the CleanPaws Self-Cleaning Litter Box, 2 bags of Meow Munchies, and the OrthoRest Dog Bed to your cart. Please note that the OrthoRest Dog Bed is currently in low stock. Your total before shipping is $442.97, which qualifies you for a 15% discount. After the discount, your total is $376.52. Since your subtotal is over $75, you qualify for free shipping. Your final total is $376.52.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CA003\", \"price\": 199.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 199.99, \"replenishInventory\": false}, {\"productId\": \"CM001\", \"price\": 42.99, \"quantity\": 2, \"bundleDiscount\": 0.1, \"total\": 81.68, \"replenishInventory\": false}, {\"productId\": \"BP012\", \"price\": 89.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 89.99, \"replenishInventory\": true}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 371.66, \"additionalDiscount\": 0.15, \"total\": 315.91}"
+  },
+  {
+    "example_id": "d25731bd-007e-459e-b82c-4bdd86b5f950",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! We are excited to offer you our CleanPaws Self-Cleaning Litter Box for $199.99. This innovative product automatically rakes waste into a sealed compartment 20 minutes after each use, eliminating the need for daily scooping. The odor-control carbon filter system keeps smells locked away, and the safety sensor pauses the rake if your cat re-enters.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CA003\", \"price\": 199.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 199.99, \"replenishInventory\": false}], \"shippingCost\": 0.0, \"petAdvice\": \"\", \"subtotal\": 199.99, \"additionalDiscount\": 0, \"total\": 199.99}"
+  },
+  {
+    "example_id": "d6a830c3-8bc8-47bc-a581-64d78c79dbc5",
+    "output": "{\"status\": \"Accept\", \"message\": \"Dear Customer! We have two great options for your kitten: Kitten Kickstart, a nutrient-dense dry food for rapid growth and development, and Purrfect Pate Wet Cat Food, a smooth, grain-free option for hydration and extra moisture. Both are currently in stock and ready for purchase.\", \"customerType\": \"Guest\", \"items\": [{\"productId\": \"CM002\", \"price\": 29.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 29.99, \"replenishInventory\": false}, {\"productId\": \"CM003\", \"price\": 28.99, \"quantity\": 1, \"bundleDiscount\": 0, \"total\": 28.99, \"replenishInventory\": false}], \"shippingCost\": 14.95, \"petAdvice\": \"\", \"subtotal\": 58.98, \"additionalDiscount\": 0, \"total\": 73.93}"
+  }
+]
