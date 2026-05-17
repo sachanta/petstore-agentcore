@@ -29,3 +29,4 @@ __pycache__/
 # Secrets — never commit API keys
 tracing/
 terraform/.env
+.arize-tmp-traces/
